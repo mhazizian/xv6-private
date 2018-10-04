@@ -126,8 +126,9 @@ panic(char *s)
 //PAGEBREAK: 50
 #define BACKSPACE 0x100
 #define CRTPORT 0x3d4
-#define LEFT 228 
-#define RIGHT 229
+#define LEFT 0xE4
+#define RIGHT 0xE5
+#define LINE_LENGTH 80
 
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
 
@@ -150,7 +151,7 @@ cgaputc(int c)
 			break;
 	
 		case (LEFT):
-			if (pos > 0)		// @todo pos > 0
+			if (pos % LINE_LENGTH > 2)
 			{
 				--pos;
 				crt[pos + 1] = crt[pos];
@@ -158,7 +159,7 @@ cgaputc(int c)
 			break;
 	
 		case ('\n'):
-			pos += 80 - pos%80;
+			pos += LINE_LENGTH - pos % LINE_LENGTH;
 			break;
 
 		case (BACKSPACE):
@@ -167,7 +168,7 @@ cgaputc(int c)
 			break;
 
 		default:
-			memmove(crt + pos + 1, crt + pos, 100 - pos % 100);
+			memmove(crt + pos + 1, crt + pos, 25 * LINE_LENGTH);
 			crt[pos++] = (c&0xff) | 0x0700;  // black on white
 			break;
 	}
@@ -287,7 +288,7 @@ consoleread(struct inode *ip, char *dst, int n)
     }
     *dst++ = c;
     --n;
-    if(c == '^')
+    if(c == '\n')
       break;
   }
   release(&cons.lock);
