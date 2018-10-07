@@ -168,7 +168,7 @@ cgaputc(int c)
 			break;
 
 		default:
-			memmove(crt + pos + 1, crt + pos, 25 * LINE_LENGTH);
+			memmove(crt + pos + 1, crt + pos, 24 * LINE_LENGTH * sizeof(crt[0]));
 			crt[pos++] = (c&0xff) | 0x0700;  // black on white
 			break;
 	}
@@ -240,6 +240,12 @@ consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
+
+    case (RIGHT):
+    case (LEFT):
+      consputc(c);
+      break;
+		
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
