@@ -35,9 +35,9 @@ void write_array(int numbers[])
 
 	if (write(file_descriptor, numbers, sizeof(int) * NUMBER_OF_ELEMENTS) < sizeof(NUMBER_OF_ELEMENTS))
 	{
-                perror("Something went wrong!\nThe program can't write on the result.txt file!\n"); 
-                return;
-        }
+								perror("Something went wrong!\nThe program can't write on the result.txt file!\n"); 
+								return;
+				}
 	close(file_descriptor);
 }
 
