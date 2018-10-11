@@ -225,6 +225,7 @@ consoleintr(int (*getc)(void))
 	int c, doprocdump = 0;
 
 	acquire(&cons.lock);
+
 	while((c = getc()) >= 0){
 		switch(c){
 		case C('P'):	// Process listing.
@@ -241,6 +242,7 @@ consoleintr(int (*getc)(void))
 			break;
 		case C('H'): case '\x7f':	// Backspace
 			if(input.end != input.w){
+				memmove(input.buf + input.e - 1, input.buf + input.e, input.end - input.e);
 				input.end--;
 				input.e--;
 				consputc(BACKSPACE);
@@ -265,14 +267,20 @@ consoleintr(int (*getc)(void))
 		default:
 			if(c != 0 && input.end - input.r < INPUT_BUF){
 				c = (c == '\r') ? '\n' : c;
-				input.buf[input.end++ % INPUT_BUF] = c;
-				input.e++;
-
+				
 				consputc(c);
 				if(c == '\n' || c == C('D') || input.end == input.r + INPUT_BUF){
+					input.buf[input.end++ % INPUT_BUF] = c;
 					input.w = input.end;
 					input.e = input.end;
 					wakeup(&input.r);
+				}
+				else
+				{
+					memmove(input.buf + input.e + 1, input.buf + input.e, input.end - input.e);
+					input.buf[input.e % INPUT_BUF] = c;
+					input.e++;
+					input.end++;
 				}
 			}
 			break;
@@ -348,4 +356,3 @@ consoleinit(void)
 
 	ioapicenable(IRQ_KBD, 0);
 }
-
