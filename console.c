@@ -173,8 +173,8 @@ static void cgaputc(int new_character)
 	switch (new_character)
 	{
 		case (RIGHT):
-			position++;
 			colorize(position, GRAY);
+			position++;
 			break;
 	
 		case (LEFT):
