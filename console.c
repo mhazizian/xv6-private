@@ -129,67 +129,86 @@ panic(char *s)
 #define LEFT 0xE4
 #define RIGHT 0xE5
 #define LINE_LENGTH 80
+#define GRAY 0x0800
+#define WHITE 0x0700
+#define BLUE 0x0300
 
 static ushort *crt = (ushort*)P2V(0xb8000);	// CGA memory
 
-static void
-cgaputc(int c)
+static void colorize(int position, int color)
 {
-	int pos;
+	crt[position] = (crt[position] & 0xff) | color;
+}
 
-	// Cursor position: col + 80*row.
+static int get_position()
+{
+	// Cursor position: col + LINE_LENGTH * row.
 	outb(CRTPORT, 14);
-	pos = inb(CRTPORT+1) << 8;
+	int position = inb(CRTPORT + 1) << 8;
 	outb(CRTPORT, 15);
-	pos |= inb(CRTPORT+1);
+	position |= inb(CRTPORT + 1);
+	return position;
+}
 
-	switch (c)
+static int scroll_up(int position)
+{
+	memmove(crt, crt + LINE_LENGTH, sizeof(crt[0]) * 23 * LINE_LENGTH);
+	position -= LINE_LENGTH;
+	memset(crt + position, 0, sizeof(crt[0]) * (24 * LINE_LENGTH - position));
+	return position;
+}
+
+static void change_outb(int position)
+{
+	outb(CRTPORT, 14);
+	outb(CRTPORT + 1, position >> 8);
+	outb(CRTPORT, 15);
+	outb(CRTPORT + 1, position);
+}
+
+static void cgaputc(int new_character)
+{
+	int position = get_position();
+
+	switch (new_character)
 	{
 		case (RIGHT):
-			pos++;
-			crt[pos] = (crt[pos] & 0xff) | 0x0500;
+			position++;
+			colorize(position, GRAY);
 			break;
 	
 		case (LEFT):
-			if (pos > 0)
-			{
-				--pos;
-			}
-			crt[pos] = crt[pos] | 0x0700;
+			if (position > 0)
+				--position;
+			colorize(position, WHITE);
 			break;
 	
 		case ('\n'):
-			pos += LINE_LENGTH - pos % LINE_LENGTH;
+			position += LINE_LENGTH - position % LINE_LENGTH;
 			break;
 
 		case (BACKSPACE):
-			if(pos > 0)
+			if(position > 0)
 			{
-				memmove(crt + pos - 1, crt + pos, 24 * LINE_LENGTH * sizeof(crt[0]));
-				--pos;
+				memmove(crt + position - 1, crt + position, 24 * LINE_LENGTH * sizeof(crt[0]));
+				--position;
 			}
 			break;
 
 		default:
-			memmove(crt + pos + 1, crt + pos, 24 * LINE_LENGTH * sizeof(crt[0]));
-			crt[pos++] = (c&0xff) | 0x0300;	// black on white
+			memmove(crt + position + 1, crt + position, 24 * LINE_LENGTH * sizeof(crt[0]));
+			crt[position] = new_character;
+			colorize(position++, BLUE);
 			break;
 	}
 
-	if(pos < 0 || pos > 25*80)
-		panic("pos under/overflow");
+	if(position < 0 || position > 25 * LINE_LENGTH)
+		panic("position under/overflow");
 
-	if((pos/80) >= 24){	// Scroll up.
-		memmove(crt, crt+80, sizeof(crt[0])*23*80);
-		pos -= 80;
-		memset(crt+pos, 0, sizeof(crt[0])*(24*80 - pos));
-	}
+	if((position / LINE_LENGTH) >= 24)
+		position = scroll_up(position);
 
-	outb(CRTPORT, 14);
-	outb(CRTPORT+1, pos>>8);
-	outb(CRTPORT, 15);
-	outb(CRTPORT+1, pos);
-	// crt[pos] = crt[pos] | 0x0700;
+	change_outb(position);		/// @todo Choose better name for this function
 }
 
 void
@@ -211,85 +230,97 @@ consputc(int c)
 #define INPUT_BUF 128
 struct {
 	char buf[INPUT_BUF];
-	uint r;			// Read index
-	uint w;			// Write index
-	uint end;		// End index
-	uint e;			// Edit index
+	uint read_index;
+	uint write_index;
+	uint end_index;
+	uint edit_index;	
 } input;
 
 #define C(x)	((x)-'@')	// Control-x
 
-void
-consoleintr(int (*getc)(void))
+void add_to_buffer(int new_character)
 {
-	int c, doprocdump = 0;
+	new_character = (new_character == '\r') ? '\n' : new_character;
 
+	consputc(new_character);
+	if(new_character == '\n' || new_character == C('D') || input.end_index == input.read_index + INPUT_BUF)
+	{
+		input.buf[input.end_index++ % INPUT_BUF] = new_character;
+		input.write_index = input.end_index;
+		input.edit_index = input.end_index;
+		wakeup(&input.read_index);
+	}
+	else
+	{
+		memmove(input.buf + input.edit_index + 1, input.buf + input.edit_index,
+				input.end_index - input.edit_index);
+		input.buf[input.edit_index % INPUT_BUF] = new_character;
+		input.edit_index++;
+		input.end_index++;
+	}
+}
+
+void consoleintr(int (*getc)(void))
+{
+	int new_character, doprocdump = 0;
 	acquire(&cons.lock);
 
-	while((c = getc()) >= 0){
-		switch(c){
-		case C('P'):	// Process listing.
-			// procdump() locks cons.lock indirectly; invoke later
-			doprocdump = 1;
-			break;
-		case C('U'):	// Kill line.
-			while(input.end != input.w &&
-						input.buf[(input.end-1) % INPUT_BUF] != '\n'){
-				input.end--;
-				consputc(BACKSPACE);
-			}
-			input.e = input.w;
-			break;
-		case C('H'): case '\x7f':	// Backspace
-			if(input.end != input.w){
-				// memmove(input.buf + input.e - 1, input.buf + input.e, 40);
-				input.end--;
-				input.e--;
-				consputc(BACKSPACE);
-			}
-			break;
-
-		case (RIGHT):
-		if (input.e < input.end)
+	while((new_character = getc()) >= 0)
+	{
+		switch(new_character)
 		{
-			input.e++;
-			consputc(c);
-		}
-			break;
-
-		case (LEFT):
-			if(input.e > input.w){
-				input.e--;
-				consputc(c);
-			}
-			break;
-		
-		default:
-			if(c != 0 && input.end - input.r < INPUT_BUF){
-				c = (c == '\r') ? '\n' : c;
-				
-				consputc(c);
-				if(c == '\n' || c == C('D') || input.end == input.r + INPUT_BUF){
-					input.buf[input.end++ % INPUT_BUF] = c;
-					input.w = input.end;
-					input.e = input.end;
-					wakeup(&input.r);
-				}
-				else
+			case C('P'):		// Process listing.
+				doprocdump = 1;
+				break;
+	
+			case C('U'):		// Kill line.
+				while(input.end_index != input.write_index 
+						&& input.buf[(input.end_index-1) % INPUT_BUF] != '\n')
 				{
-					memmove(input.buf + input.e + 1, input.buf + input.e, 40);
-					input.buf[input.e] = c;
-					input.e++;
-					input.end++;
+					input.end_index--;
+					consputc(BACKSPACE);
 				}
-			}
-			break;
+				input.edit_index = input.write_index;
+				break;
+	
+			case C('H'):
+			case BACKSPACE:
+				if(input.end_index != input.write_index)
+				{
+					memmove(input.buf + input.edit_index - 1, input.buf + input.edit_index, 
+							input.end_index - input.edit_index);
+					input.end_index--;
+					input.edit_index--;
+					consputc(BACKSPACE);
+				}
+				break;
+	
+			case (RIGHT):
+				if (input.edit_index < input.end_index)
+				{
+					input.edit_index++;
+					consputc(new_character);
+				}
+				break;
+	
+			case (LEFT):
+				if(input.edit_index > input.write_index)
+				{
+					input.edit_index--;
+					consputc(new_character);
+				}
+				break;
+			
+			default:
+				if(new_character != 0 && input.end_index - input.read_index < INPUT_BUF)
+					add_to_buffer(new_character);
+				break;
 		}
 	}
+
 	release(&cons.lock);
-	if(doprocdump) {
-		procdump();	// now call procdump() wo. cons.lock held
-	}
+	if(doprocdump)
+		procdump();		// now call procdump() wo. cons.lock held
 }
 
 int
@@ -302,22 +333,20 @@ consoleread(struct inode *ip, char *dst, int n)
 	target = n;
 	acquire(&cons.lock);
 	while(n > 0){
-		while(input.r == input.w){
+		while(input.read_index == input.write_index){
 			if(myproc()->killed){
 				release(&cons.lock);
 				ilock(ip);
 				return -1;
 			}
-			sleep(&input.r, &cons.lock);
+			sleep(&input.read_index, &cons.lock);
 		}
-		// printint(999999999, 10, 1);
-		// printint(-input.r, 10, 1);
-		c = input.buf[input.r++ % INPUT_BUF];
+		c = input.buf[input.read_index++ % INPUT_BUF];
 		if(c == C('D')){	// EOF
 			if(n < target){
 				// Save ^D for next time, to make sure
 				// caller gets a 0-byte result.
-				input.r--;
+				input.read_index--;
 			}
 			break;
 		}
@@ -358,4 +387,3 @@ consoleinit(void)
 
 	ioapicenable(IRQ_KBD, 0);
 }
-
