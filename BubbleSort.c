@@ -46,7 +46,15 @@ void write_array(char* numbers[])
 
 int main(int argc, char *argv[])
 {
-	bubble_sort(&argv[1]);
-	write_array(&argv[1]);
-	exit();
+	if (argc == (NUMBER_OF_ELEMENTS + 1))
+	{
+		bubble_sort(&argv[1]);
+		write_array(&argv[1]);
+		exit();
+	}
+	else
+	{
+		printf(2, "Invalid input!!!\n");
+		exit();
+	}
 }
