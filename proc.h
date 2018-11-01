@@ -1,6 +1,12 @@
 // Per-CPU state
 
-#define SYS_CALL_NUMBERS    22 /// @todo move this to appropriate place
+#define SYS_CALL_NUMBERS    23 /// @todo move this to appropriate place
+
+struct system_call {
+    int number_of_calls;
+};
+
+struct system_call system_calls[SYS_CALL_NUMBERS];
 
 struct cpu {
 	uchar apicid;								// Local APIC ID
@@ -37,13 +43,9 @@ struct context {
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
-struct system_call {
-    int number_of_calls;
-};
-
 // Per-process state
 struct proc {
-    struct system_call system_calls[SYS_CALL_NUMBERS];
+        struct system_call system_calls[SYS_CALL_NUMBERS];
 	int last_system_call;
 	uint sz;										 // Size of process memory (bytes)
 	pde_t* pgdir;								// Page table

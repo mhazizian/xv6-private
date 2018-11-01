@@ -46,7 +46,7 @@ void write_array(char* numbers[])
 
 int main(int argc, char *argv[])
 {
-	printf(1, "%d", invoked_syscalls());
+//        printf(1, "%d", invoked_syscalls(19));
 	if (argc == (NUMBER_OF_ELEMENTS + 1))
 	{
 		bubble_sort(&argv[1]);

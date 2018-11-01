@@ -12,8 +12,6 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
-
-
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -536,14 +534,13 @@ procdump(void)
 }
 
 
-int
-invoked_syscalls(int pid)
+int invoked_syscalls(int pid)
 {
 	struct proc* process;
 
     acquire(&ptable.lock);
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++){
-        if(process->pid == pid){
+	if(process->pid == pid){
 
 //            process->killed = 1;
             // Wake process from sleep if necessary.
@@ -557,6 +554,6 @@ invoked_syscalls(int pid)
 
 
 
-	cprintf("Hiiiiiiiiiiiiiiiiiiiiiiiii\n");
+        cprintf("Hiiiiiiiiiiiiiiiiiiiiiiiii %d \n", pid);
 	return 3;
 }
