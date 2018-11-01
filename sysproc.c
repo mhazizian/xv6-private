@@ -89,3 +89,11 @@ sys_uptime(void)
 	release(&tickslock);
 	return xticks;
 }
+
+
+int
+sys_invoked_syscalls(void)
+{
+	return invoked_syscalls(3);
+}
+
