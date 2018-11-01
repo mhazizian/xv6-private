@@ -536,24 +536,25 @@ procdump(void)
 
 int invoked_syscalls(int pid)
 {
-	struct proc* process;
+    struct proc* process;
+    int i;
 
     acquire(&ptable.lock);
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++){
-	if(process->pid == pid){
-
-//            process->killed = 1;
-            // Wake process from sleep if necessary.
-//            if(process->state == SLEEPING)
-//                process->state = RUNNABLE;
+	if(process->pid == pid && !(process->killed))
+	{
+	    for (i = 0; i < SYS_CALL_NUMBERS; ++i)
+		if (process_system_calls[pid][i].number_of_calls != 0)
+		    cprintf("System call ID : %d "
+		            "Number of calls : %d Total calls : %d\n",
+		            i, process_system_calls[pid][i].number_of_calls,
+		            system_calls[i]);
             release(&ptable.lock);
             return 0;
         }
     }
+
+    cprintf("Process not found!\n");
     release(&ptable.lock);
-
-
-
-        cprintf("Hiiiiiiiiiiiiiiiiiiiiiiiii %d \n", pid);
-	return 3;
+    return 3;
 }

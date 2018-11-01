@@ -46,11 +46,11 @@ void write_array(char* numbers[])
 
 int main(int argc, char *argv[])
 {
-//        printf(1, "%d", invoked_syscalls(19));
 	if (argc == (NUMBER_OF_ELEMENTS + 1))
 	{
 		bubble_sort(&argv[1]);
 		write_array(&argv[1]);
+		invoked_syscalls(getpid());
 		exit();
 	}
 	else

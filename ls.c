@@ -30,8 +30,6 @@ ls(char *path)
 	struct dirent de;
 	struct stat st;
 
-	printf(1, "%d", invoked_syscalls(19));
-
 	if((fd = open(path, 0)) < 0){
 		printf(2, "ls: cannot open %s\n", path);
 		return;

@@ -1,4 +1,7 @@
+#include "param.h"
+
 // Per-CPU state
+
 
 #define SYS_CALL_NUMBERS    23 /// @todo move this to appropriate place
 
@@ -7,6 +10,7 @@ struct system_call {
 };
 
 struct system_call system_calls[SYS_CALL_NUMBERS];
+struct system_call process_system_calls[NPROC][SYS_CALL_NUMBERS];
 
 struct cpu {
 	uchar apicid;								// Local APIC ID
@@ -45,7 +49,6 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
-        struct system_call system_calls[SYS_CALL_NUMBERS];
 	int last_system_call;
 	uint sz;										 // Size of process memory (bytes)
 	pde_t* pgdir;								// Page table
