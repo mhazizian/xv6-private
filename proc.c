@@ -548,16 +548,16 @@ int invoked_syscalls(int pid)
 	    {
 		cprintf("*** System call ID : %d "
 		        "Number of calls : %d Total calls : %d \n"
-		        "Time of system call: %d**%d##%d\n***\n",
+/*		        "Time of system call: %d**%d##%d\n***\n"*/,
 		        i, process_system_calls[pid][i].number_of_calls,
-		        system_calls[i],
-		        process_system_calls[pid][i].time.hour,
-		        process_system_calls[pid][i].time.minute,
-		        process_system_calls[pid][i].time.second);
+		        system_calls[i]/*,
+			process_system_calls[pid][i].time.hour,
+			process_system_calls[pid][i].time.minute,
+			process_system_calls[pid][i].time.second*/);
 
-		cprintf("%d - ### pid in invoke = %d\n",
-		        i, process_system_calls[pid][i].
-		        arguments[FIRST].int_value);
+//		cprintf("%d - ### pid in invoke = %d\n",
+//		        i, process_system_calls[pid][i].
+//		        arguments[FIRST].int_value);
 	    }
         release(&ptable.lock);
         return 0;

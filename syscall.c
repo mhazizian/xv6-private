@@ -140,14 +140,8 @@ syscall(void)
 	if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
 	        process_system_calls[curproc->pid][num].number_of_calls++;
 		        system_calls[num].number_of_calls++;
-			cmostime(&system_calls[num].time);
+//			cmostime(&system_calls[num].time);
 
-//		if (num == 22)
-//		{
-//		    cprintf("num:  %d------  number: %d   ---- system_calls: %d ** pid : %d\n",num,
-//		            process_system_calls[curproc->pid][num].number_of_calls,
-//		            system_calls[num].number_of_calls, curproc->pid);
-//		}
 		curproc->tf->eax = syscalls[num]();
 	} else {
 		cprintf("%d %s: unknown sys call %d\n",

@@ -1,11 +1,11 @@
-sys_fork : void
-sys_exit : void
-sys_wait : void
+sys_fork : void // DONE
+sys_exit : void // DONE
+sys_wait : void // DONE
 sys_kill : int pid // DONE
-sys_getpid : void
+sys_getpid : void // DONE
 sys_sbrk : int n // DONE
 sys_sleep : void *chan, struct spinlock *lk
-sys_uptime : void
+sys_uptime : void // DONE
 sys_dup : struct file* f
 sys_read : struct file*, char*, int n
 sys_write :struct file*, char*, int n
