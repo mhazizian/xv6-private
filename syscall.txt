@@ -13,10 +13,10 @@ sys_close : struct file*
 sys_fstat : struct file*, struct stat*
 sys_link : char name[DIRSIZ], *new, *old
 sys_unlink : char name[DIRSIZ], *path
-sys_open : char *path, int omode
-sys_mkdir : char *path
-sys_mknod : char *path, int major, minor
-sys_chdir : char *path
-sys_exec :  exec(char*, char**)
+sys_open : char *path, int omode // DONE
+sys_mkdir : char *path // DONE
+sys_mknod : char *path, int major, minor // DONE
+sys_chdir : char *path // DONE
+sys_exec :  exec(char*, char**) // char* : DONE
 sys_pipe : int *fd
 sys_invoke_system_calls : int pid // DONE

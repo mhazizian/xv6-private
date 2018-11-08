@@ -4,30 +4,34 @@
 
 #define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
+#define MAX_SYS_CALL_NUMBERS 16
+#define MAX_CHARP_SIZE 16
+#define MAX_INTP_SIZE 16
 #define FIRST 0
 #define SECOND 1
 #define THIRD 2
 
 enum argument_type {
     VOID,
-    INT
+    INT,
+    CHARP
 };
 
 struct argumnet
 {
      enum argument_type type;
      int int_value;
+     char charp_value[MAX_CHARP_SIZE];
 };
 
-//struct single_system_call {
-//    struct rtcdate time;
-//    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
-//};
+struct system_call_status {
+    struct rtcdate time;
+    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
+};
 
 struct system_call {
     int number_of_calls;
-    struct rtcdate time;
-    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
+    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS];
 };
 
 struct system_call system_calls[SYS_CALL_NUMBERS];

@@ -8,22 +8,18 @@
 #include "proc.h"
 #include "syscall.h"
 
-//void
-//set_file_argument(struct file* value, int argument_number, int system_call_number)
-//{
-//    value->type = FD_INODE;
-//}
-
 void
 set_int_argument(int value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
     int kill_pid = curproc->pid;
     cprintf("*** %d\n", kill_pid);
-    process_system_calls[kill_pid][system_call_number].
-            arguments[argument_number].type = INT;
-    process_system_calls[kill_pid][system_call_number].
-            arguments[argument_number].int_value = value;
+
+    struct system_call* system_call_struct = &process_system_calls[kill_pid][system_call_number];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+	(*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = INT;
+	(*system_call_struct).system_calls[number_of_calls].arguments[argument_number].int_value = value;
 }
 
 void
@@ -31,8 +27,11 @@ set_void_argument(int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
     int kill_pid = curproc->pid;
-    process_system_calls[kill_pid][system_call_number].
-            arguments[argument_number].type = VOID;
+
+    struct system_call* system_call_struct = &process_system_calls[kill_pid][system_call_number];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+    (*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = VOID;
 }
 
 int

@@ -15,6 +15,33 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
+#include "syscall.h"
+
+extern void set_void_argument(int argument_number, int system_call_number);
+extern void set_int_argument(int value, int argument_number,
+        int system_call_number);
+
+void set_charp_argument(char* value, int argument_number, int system_call_number)
+{
+    struct proc* curproc = myproc();
+    int kill_pid = curproc->pid;
+    int i;
+
+    struct system_call* system_call_struct = &process_system_calls[kill_pid][system_call_number];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].type = CHARP;
+
+
+    for (i = 0; i < MAX_CHARP_SIZE; ++i)
+    {
+	if (value[i] == '\0')
+	    break;
+	(*system_call_struct).system_calls[number_of_calls].
+	        arguments[argument_number].charp_value[i] = value[i];
+    }
+}
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
@@ -330,6 +357,10 @@ sys_open(void)
 	f->off = 0;
 	f->readable = !(omode & O_WRONLY);
 	f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
+
+	set_charp_argument(path, FIRST, SYS_open);
+	set_int_argument(omode, SECOND, SYS_open);
+
 	return fd;
 }
 
@@ -346,6 +377,8 @@ sys_mkdir(void)
 	}
 	iunlockput(ip);
 	end_op();
+	set_charp_argument(path, FIRST, SYS_mkdir);
+
 	return 0;
 }
 
@@ -366,6 +399,10 @@ sys_mknod(void)
 	}
 	iunlockput(ip);
 	end_op();
+	set_charp_argument(path, FIRST, SYS_mknod);
+	set_int_argument(major, SECOND, SYS_mknod);
+	set_int_argument(minor, THIRD, SYS_mknod);
+
 	return 0;
 }
 
@@ -391,6 +428,8 @@ sys_chdir(void)
 	iput(curproc->cwd);
 	end_op();
 	curproc->cwd = ip;
+	set_charp_argument(path, FIRST, SYS_chdir);
+
 	return 0;
 }
 
@@ -417,6 +456,9 @@ sys_exec(void)
 		if(fetchstr(uarg, &argv[i]) < 0)
 			return -1;
 	}
+
+	set_charp_argument(path, FIRST, SYS_exec);
+	// @TODO add char**
 	return exec(path, argv);
 }
 

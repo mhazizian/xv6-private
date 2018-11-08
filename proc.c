@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "syscall.h"
 
 struct {
 	struct spinlock lock;
@@ -547,13 +548,19 @@ int invoked_syscalls(int pid)
             if (process_system_calls[pid][i].number_of_calls != 0)
 	    {
 		cprintf("*** System call ID : %d "
-		        "Number of calls : %d Total calls : %d \n"
-/*		        "Time of system call: %d**%d##%d\n***\n"*/,
+		        "Number of calls : %d Total calls : %d \n",
 		        i, process_system_calls[pid][i].number_of_calls,
-		        system_calls[i]/*,
-			process_system_calls[pid][i].time.hour,
-			process_system_calls[pid][i].time.minute,
-			process_system_calls[pid][i].time.second*/);
+		        system_calls[i]);
+
+		if (i == SYS_open)
+		{
+		    int number_of_calls = process_system_calls[pid][i].number_of_calls;
+		    cprintf("############### CHARP VALUE ##################\n");
+//		    for (i = 0; i < MAX_CHAR_STAR_SIZE; ++i)
+		        cprintf("%s\n", process_system_calls[pid][i].
+			        system_calls[number_of_calls].
+			        arguments[FIRST].charp_value);
+		}
 
 //		cprintf("%d - ### pid in invoke = %d\n",
 //		        i, process_system_calls[pid][i].
