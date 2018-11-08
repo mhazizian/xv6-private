@@ -1,12 +1,33 @@
 #include "param.h"
-
+#include "date.h"
 // Per-CPU state
 
+#define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
+#define MAX_ARGUMENTS_NUMBER 3
+#define FIRST 0
+#define SECOND 1
+#define THIRD 2
 
-#define SYS_CALL_NUMBERS    23 /// @todo move this to appropriate place
+enum argument_type {
+    VOID,
+    INT
+};
+
+struct argumnet
+{
+     enum argument_type type;
+     int int_value;
+};
+
+//struct single_system_call {
+//    struct rtcdate time;
+//    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
+//};
 
 struct system_call {
     int number_of_calls;
+    struct rtcdate time;
+    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
 };
 
 struct system_call system_calls[SYS_CALL_NUMBERS];

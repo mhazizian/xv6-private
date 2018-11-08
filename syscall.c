@@ -6,7 +6,6 @@
 #include "proc.h"
 #include "x86.h"
 #include "syscall.h"
-
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -135,11 +134,14 @@ syscall(void)
 {
 	int num;
 	struct proc *curproc = myproc();
-
+//    char *sss =(char*) malloc(1);
+//    cprintf("%s", sss);
 	num = curproc->tf->eax;
 	if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
 	        process_system_calls[curproc->pid][num].number_of_calls++;
-		system_calls[num].number_of_calls++;
+		        system_calls[num].number_of_calls++;
+			cmostime(&system_calls[num].time);
+
 //		if (num == 22)
 //		{
 //		    cprintf("num:  %d------  number: %d   ---- system_calls: %d ** pid : %d\n",num,

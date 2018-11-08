@@ -543,14 +543,24 @@ int invoked_syscalls(int pid)
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++){
 	if(process->pid == pid && !(process->killed))
 	{
-	    for (i = 0; i < SYS_CALL_NUMBERS; ++i)
-		if (process_system_calls[pid][i].number_of_calls != 0)
-		    cprintf("System call ID : %d "
-		            "Number of calls : %d Total calls : %d\n",
-		            i, process_system_calls[pid][i].number_of_calls,
-		            system_calls[i]);
-            release(&ptable.lock);
-            return 0;
+        for (i = 0; i < SYS_CALL_NUMBERS; ++i)
+            if (process_system_calls[pid][i].number_of_calls != 0)
+	    {
+		cprintf("*** System call ID : %d "
+		        "Number of calls : %d Total calls : %d \n"
+		        "Time of system call: %d**%d##%d\n***\n",
+		        i, process_system_calls[pid][i].number_of_calls,
+		        system_calls[i],
+		        process_system_calls[pid][i].time.hour,
+		        process_system_calls[pid][i].time.minute,
+		        process_system_calls[pid][i].time.second);
+
+		cprintf("%d - ### pid in invoke = %d\n",
+		        i, process_system_calls[pid][i].
+		        arguments[FIRST].int_value);
+	    }
+        release(&ptable.lock);
+        return 0;
         }
     }
 

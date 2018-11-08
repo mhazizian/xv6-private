@@ -6,16 +6,46 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "syscall.h"
+
+//void
+//set_file_argument(struct file* value, int argument_number, int system_call_number)
+//{
+//    value->type = FD_INODE;
+//}
+
+void
+set_int_argument(int value, int argument_number, int system_call_number)
+{
+    struct proc* curproc = myproc();
+    int kill_pid = curproc->pid;
+    cprintf("*** %d\n", kill_pid);
+    process_system_calls[kill_pid][system_call_number].
+            arguments[argument_number].type = INT;
+    process_system_calls[kill_pid][system_call_number].
+            arguments[argument_number].int_value = value;
+}
+
+void
+set_void_argument(int argument_number, int system_call_number)
+{
+    struct proc* curproc = myproc();
+    int kill_pid = curproc->pid;
+    process_system_calls[kill_pid][system_call_number].
+            arguments[argument_number].type = VOID;
+}
 
 int
 sys_fork(void)
 {
+        set_void_argument(FIRST, SYS_fork);
 	return fork();
 }
 
 int
 sys_exit(void)
 {
+        set_void_argument(FIRST, SYS_exit);
 	exit();
 	return 0;	// not reached
 }
@@ -23,29 +53,34 @@ sys_exit(void)
 int
 sys_wait(void)
 {
+        set_void_argument(FIRST, SYS_wait);
 	return wait();
 }
+
 
 int
 sys_kill(void)
 {
-	int pid;
+    int pid;
 
-	if(argint(0, &pid) < 0)
-		return -1;
-	return kill(pid);
+    if(argint(0, &pid) < 0)
+	    return -1;
+
+    set_int_argument(pid, FIRST, SYS_kill);
+    return kill(pid);
 }
 
 int
 sys_getpid(void)
 {
+        set_void_argument(FIRST, SYS_getpid);
 	return myproc()->pid;
 }
 
 int
 sys_sbrk(void)
 {
-	int addr;
+        int addr;
 	int n;
 
 	if(argint(0, &n) < 0)
@@ -53,6 +88,8 @@ sys_sbrk(void)
 	addr = myproc()->sz;
 	if(growproc(n) < 0)
 		return -1;
+
+	set_int_argument(n, FIRST, SYS_sbrk);
 	return addr;
 }
 
@@ -74,6 +111,7 @@ sys_sleep(void)
 		sleep(&ticks, &tickslock);
 	}
 	release(&tickslock);
+
 	return 0;
 }
 
@@ -82,6 +120,7 @@ sys_sleep(void)
 int
 sys_uptime(void)
 {
+        set_void_argument(FIRST, SYS_uptime);
 	uint xticks;
 
 	acquire(&tickslock);
@@ -94,11 +133,11 @@ sys_uptime(void)
 int
 sys_invoked_syscalls(void)
 {
-	int pid;
+    int pid;
+    if(argint(0, &pid) < 0)
+	    return -1;
 
-	if(argint(0, &pid) < 0)
-		return -1;
-
-	return invoked_syscalls(pid);
+    set_int_argument(pid, FIRST, SYS_invoked_syscalls);
+    return invoked_syscalls(pid);
 }
 

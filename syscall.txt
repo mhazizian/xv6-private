@@ -1,0 +1,22 @@
+sys_fork : void
+sys_exit : void
+sys_wait : void
+sys_kill : int pid // DONE
+sys_getpid : void
+sys_sbrk : int n // DONE
+sys_sleep : void *chan, struct spinlock *lk
+sys_uptime : void
+sys_dup : struct file* f
+sys_read : struct file*, char*, int n
+sys_write :struct file*, char*, int n
+sys_close : struct file*
+sys_fstat : struct file*, struct stat*
+sys_link : char name[DIRSIZ], *new, *old
+sys_unlink : char name[DIRSIZ], *path
+sys_open : char *path, int omode
+sys_mkdir : char *path
+sys_mknod : char *path, int major, minor
+sys_chdir : char *path
+sys_exec :  exec(char*, char**)
+sys_pipe : int *fd
+sys_invoke_system_calls : int pid // DONE
