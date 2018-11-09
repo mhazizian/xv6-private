@@ -11,7 +11,7 @@
 void
 print_system_call_status(struct system_call_status* s1)
 {
-	struct argumnet arg;
+	struct argument arg;
 	int j;
 	cprintf("id of syscall:  %d\n", s1->syscall_number);
 	for (j = 0; j < MAX_ARGUMENTS_NUMBER; j++) {
@@ -569,7 +569,7 @@ int invoked_syscalls(int pid)
 {
     struct proc* process;
     int i, j, t;
-    struct argumnet arg;
+    struct argument arg;
 //    struct rtcdate time;
 
     acquire(&ptable.lock);
