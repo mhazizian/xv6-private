@@ -21,6 +21,37 @@ extern void set_void_argument(int argument_number, int system_call_number);
 extern void set_int_argument(int value, int argument_number,
         int system_call_number);
 
+
+
+void set_charpp_argument(char* value, int argument_number, int system_call_number)
+{
+    struct proc* curproc = myproc();
+    int pid = curproc->pid;
+    int i, j;
+
+    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].type = CHARPP;
+
+    for(j = 0; j < MAX_CHARPP_SIZE; j++) {
+		for (i = 0; i < MAX_CHARP_SIZE; i++) {
+			if (value[j][i] == '\0') {
+				(*system_call_struct).system_calls[number_of_calls].
+						arguments[argument_number].charpp_value[j][i] = '\0';
+				break;
+			}
+		}
+		if (value[j][0] == '\0') {
+			(*system_call_struct).system_calls[number_of_calls].
+					arguments[argument_number].charpp_value[j][0] = '\0';
+			break;
+		}
+	}
+}
+
+
 void set_charp_argument(char* value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();

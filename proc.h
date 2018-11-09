@@ -6,6 +6,7 @@
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 16
 #define MAX_CHARP_SIZE 16
+#define MAX_CHARPP_SIZE 5
 #define MAX_INTP_SIZE 16
 #define FIRST 0
 #define SECOND 1
@@ -14,7 +15,9 @@
 enum argument_type {
     VOID,
     INT,
-    CHARP
+    CHARP,
+    CHARPP
+
 };
 
 struct argumnet
@@ -22,6 +25,7 @@ struct argumnet
      enum argument_type type;
      int int_value;
      char charp_value[MAX_CHARP_SIZE];
+     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
 };
 
 struct system_call_status {
