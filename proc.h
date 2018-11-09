@@ -44,7 +44,7 @@ struct system_call {
 
 struct array_of_syscall_pointer {
     int number_of_calls;
-    struct system_call* items[NPROC * MAX_SYS_CALL_NUMBERS];
+    struct system_call_status* items[NPROC * MAX_SYS_CALL_NUMBERS];
 } sorted_syscalls;
 
 
