@@ -20,6 +20,11 @@ enum argument_type {
 
 };
 
+// for saving all arguments passed to a system_call
+// type of arguments is stored in argument_type
+// int_value is used for storing int agruments
+// charp_value is used for storing char* and strings
+// all other values of type pointer is stored in pp_value.
 struct argument
 {
      enum argument_type type;
@@ -29,19 +34,28 @@ struct argument
 //     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
 };
 
-struct system_call_status {
-	int syscall_number;
-	int index_in_sorted_syscalls_by_time;
 
-    struct rtcdate time;
-    struct argument arguments[MAX_ARGUMENTS_NUMBER];
+
+struct system_call_status {
+	int syscall_number;									// ID of system call
+	int index_in_sorted_syscalls_by_time;				// index of this system_call in sorted_syscalls
+														//wich is sorted by time of user
+
+    struct rtcdate time;								
+    struct argument arguments[MAX_ARGUMENTS_NUMBER];	// system_call arguments
 };
 
+// used to store array if system_call_status
+// number of stored system_call_status objects is stored in number_of_calls
+// system_calls is One based.
 struct system_call {
     int number_of_calls;
-    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS];
+    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS]; 	// One based array
 };
 
+// array of pointer to system_call_status
+// used to store system_call status in order of usage time
+// number of stored system_call_status objects is stored in number_of_calls 
 struct array_of_syscall_pointer {
     int number_of_calls;
     struct system_call_status* items[NPROC * MAX_SYS_CALL_NUMBERS];
