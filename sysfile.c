@@ -28,8 +28,20 @@ void swap_syscalls(struct system_call_status* s1, struct system_call_status* s2)
 	s2 = s3;
 }
 
+void config_new_syscall_status(struct system_call_status* new_element, int syscall_id)
+{
+    // Add new syscall struct to the end of sorted_syscalls by time
+    sorted_syscalls.items[sorted_syscalls.number_of_calls] = new_element;
 
-void reorder_sorted_syscall_by_syscall_num(int pid)
+    new_element->index_in_sorted_syscalls_by_time = sorted_syscalls.number_of_calls;
+    new_element->syscall_number = syscall_id;
+
+	sorted_syscalls.number_of_calls++;
+
+}
+
+
+void reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
 {
 	int i, j;
     // struct proc* curproc = myproc();
@@ -39,12 +51,8 @@ void reorder_sorted_syscall_by_syscall_num(int pid)
     struct system_call_status* system_call_status_struct = process_system_calls[pid].system_calls;
     int number_of_calls = process_system_calls[pid].number_of_calls;
 
-
     struct system_call_status* last_element = &system_call_status_struct[number_of_calls];
-
-    // Add new syscall struct to the end of sorted_syscalls by time
-    sorted_syscalls.items[sorted_syscalls.number_of_calls] = last_element;
-	sorted_syscalls.number_of_calls++;
+    config_new_syscall_status(last_element, syscall_id);
 
 	for(i = 1; i <= number_of_calls; i++)
     {
@@ -64,7 +72,7 @@ void reorder_sorted_syscall_by_syscall_num(int pid)
 
 
 
-void set_charpp_argument(char** value, int argument_number, int system_call_number)
+void set_pp_argument(uint value, int argument_number, int system_call_number)
 {
 //    int i, j;
  	struct proc* curproc = myproc();
@@ -175,6 +183,12 @@ sys_read(void)
 
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
+
+	set_pp_argument((uint)f, FIRST, SYS_write);
+	set_charp_argument(p, SECOND, SYS_write);
+	set_int_argument(n, THIRD, SYS_write);
+
+
 	return fileread(f, p, n);
 }
 
@@ -187,6 +201,12 @@ sys_write(void)
 
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
+
+	set_pp_argument((uint)f, FIRST, SYS_write);
+	set_charp_argument(p, SECOND, SYS_write);
+	set_int_argument(n, THIRD, SYS_write);
+
+
 	return filewrite(f, p, n);
 }
 
@@ -531,7 +551,7 @@ sys_exec(void)
 	}
 
 	set_charp_argument(path, FIRST, SYS_exec);
-	set_charpp_argument(argv, SECOND, SYS_exec);
+	set_pp_argument((uint)argv, SECOND, SYS_exec);
 	// @TODO add char**
 	return exec(path, argv);
 }

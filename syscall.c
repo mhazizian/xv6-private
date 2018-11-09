@@ -104,7 +104,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_invoked_syscalls(void);
 
-extern void reorder_sorted_syscall_by_syscall_num(int);
+extern void reorder_sorted_syscall_by_syscall_num(int, int);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]		sys_fork,
@@ -148,7 +148,7 @@ syscall(void)
 //			cmostime(&system_calls[num].time);
 
         curproc->tf->eax = syscalls[num]();
-        reorder_sorted_syscall_by_syscall_num(curproc->pid);
+        reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
 
     } else {
 		cprintf("%d %s: unknown sys call %d\n",
