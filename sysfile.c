@@ -27,7 +27,7 @@ void set_charpp_argument(char** value, int argument_number, int system_call_numb
 {
     struct proc* curproc = myproc();
     int pid = curproc->pid;
-    int i, j;
+//    int i, j;
 
     struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
     int number_of_calls = (*system_call_struct).number_of_calls;
@@ -35,43 +35,43 @@ void set_charpp_argument(char** value, int argument_number, int system_call_numb
     (*system_call_struct).system_calls[number_of_calls].
             arguments[argument_number].type = CHARPP;
 
-    for(j = 0; j < MAX_CHARPP_SIZE; j++) {
-		for (i = 0; i < MAX_CHARP_SIZE; i++) {
-			if (value[j][i] == '\0') {
-				(*system_call_struct).system_calls[number_of_calls].
-						arguments[argument_number].charpp_value[j][i] = '\0';
-				break;
-			}
-		}
-		if (value[j][0] == '\0') {
-			(*system_call_struct).system_calls[number_of_calls].
-					arguments[argument_number].charpp_value[j][0] = '\0';
-			break;
-		}
-	}
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].pp_value = (uint) value;
+
+//    for(j = 0; j < MAX_CHARPP_SIZE; j++) {
+//		for (i = 0; i < MAX_CHARP_SIZE; i++) {
+//				(*system_call_struct).system_calls[number_of_calls].
+//						arguments[argument_number].charpp_value[j][i] = '\0';
+//			if (value[j][i] == '\0')
+//				break;
+//		}
+////		if (value[j] == (char*)0) {
+////			system_call_struct->system_calls[number_of_calls].
+////					arguments[argument_number].charpp_value[j] = (char*) 0;
+////			break;
+////		}
+//	}
 }
 
 
 void set_charp_argument(char* value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
-    int kill_pid = curproc->pid;
+    int pid = curproc->pid;
     int i;
 
-    struct system_call* system_call_struct = &process_system_calls[kill_pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
     (*system_call_struct).system_calls[number_of_calls].
             arguments[argument_number].type = CHARP;
 
-
     for (i = 0; i < MAX_CHARP_SIZE; ++i)
     {
-		if (value[i] == '\0') {
-			(*system_call_struct).system_calls[number_of_calls].
-					arguments[argument_number].charp_value[i] = value[i];
+		(*system_call_struct).system_calls[number_of_calls].
+				arguments[argument_number].charp_value[i] = value[i];
+		if (value[i] == '\0')
 			break;
-		}
     }
 }
 
@@ -490,6 +490,7 @@ sys_exec(void)
 	}
 
 	set_charp_argument(path, FIRST, SYS_exec);
+	set_charpp_argument(argv, SECOND, SYS_exec);
 	// @TODO add char**
 	return exec(path, argv);
 }

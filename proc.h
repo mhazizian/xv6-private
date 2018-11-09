@@ -25,7 +25,8 @@ struct argumnet
      enum argument_type type;
      int int_value;
      char charp_value[MAX_CHARP_SIZE];
-     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
+     uint pp_value;
+//     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
 };
 
 struct system_call_status {

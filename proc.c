@@ -538,40 +538,61 @@ procdump(void)
 int invoked_syscalls(int pid)
 {
     struct proc* process;
-    int i;
+    int i, j, t;
+    struct argumnet arg;
+//    struct rtcdate time;
 
     acquire(&ptable.lock);
-    for(process = ptable.proc; process < &ptable.proc[NPROC]; process++){
-	if(process->pid == pid && !(process->killed))
-	{
-        for (i = 0; i < SYS_CALL_NUMBERS; ++i)
-            if (process_system_calls[pid][i].number_of_calls != 0)
-	    {
-		cprintf("*** System call ID : %d "
-		        "Number of calls : %d Total calls : %d \n",
-		        i, process_system_calls[pid][i].number_of_calls,
-		        system_calls[i]);
+    for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
+    {
+        if(process->pid == pid) // && !(process->killed)
+        {
+            for (i = 0; i < SYS_CALL_NUMBERS; ++i) {
+                if (process_system_calls[pid][i].number_of_calls != 0) {
 
-		if (i == SYS_open)
-		{
-		    int number_of_calls = process_system_calls[pid][i].number_of_calls;
-		    cprintf("############### CHARP VALUE ##################\n");
-//		    for (i = 0; i < MAX_CHAR_STAR_SIZE; ++i)
-		        cprintf("%s\n", process_system_calls[pid][i].
-			        system_calls[number_of_calls].
-			        arguments[FIRST].charp_value);
-		}
+                    cprintf("*** System call ID : %d "
+                            "Number of calls : %d Total calls : %d \n",
+                            i, process_system_calls[pid][i].number_of_calls,
+                            system_calls[i]);
+                    for(t = 1; t <= process_system_calls[pid][i].number_of_calls; t++) {
+                        for (j = 0; j < 3; j++) {
+                            arg = process_system_calls[pid][i].system_calls[t].arguments[j];
+                            switch (arg.type) {
+                                case VOID:
+                                    //                                cprintf("void\n");
+                                    break;
+                                case INT:
+                                    cprintf("   |__int: %d\n", arg.int_value);
+                                    break;
+                                case CHARP:
+                                    cprintf("   |__char*: %s\n", arg.charp_value);
+                                    break;
+                                case CHARPP:
+                                    cprintf("   |__**: %d \n", arg.pp_value);
 
-//		cprintf("%d - ### pid in invoke = %d\n",
-//		        i, process_system_calls[pid][i].
-//		        arguments[FIRST].int_value);
-	    }
-        release(&ptable.lock);
-        return 0;
+//                                    for (k = 0; k < MAX_CHARPP_SIZE; k++) {
+//                                        if (arg.charpp_value[k] == '\0') {
+//                                            break;
+//                                        }
+//                                        cprintf("  |__%dth char* value is: %s\n", k + 1, arg.charpp_value[k]);
+//                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+//                    time = process_system_calls[pid][i].time;
+
+                }
+            }
+            release(&ptable.lock);
+            return 0;
         }
     }
 
     cprintf("Process not found!\n");
     release(&ptable.lock);
     return 3;
+
 }
