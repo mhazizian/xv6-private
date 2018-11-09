@@ -4,7 +4,7 @@
 
 #define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
-#define MAX_SYS_CALL_NUMBERS 10
+#define MAX_SYS_CALL_NUMBERS 220
 #define MAX_CHARP_SIZE 10
 #define MAX_CHARPP_SIZE 3
 #define MAX_INTP_SIZE 12
@@ -30,6 +30,9 @@ struct argumnet
 };
 
 struct system_call_status {
+	int syscall_number;
+	int index_in_sorted_syscalls_by_time;
+
     struct rtcdate time;
     struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
 };
@@ -39,8 +42,15 @@ struct system_call {
     struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS];
 };
 
-struct system_call system_calls[SYS_CALL_NUMBERS];
-struct system_call process_system_calls[NPROC][SYS_CALL_NUMBERS];
+struct array_of_syscall_pointer {
+    int number_of_calls;
+    struct system_call* items[NPROC * MAX_SYS_CALL_NUMBERS];
+} sorted_syscalls;
+
+
+int system_calls[SYS_CALL_NUMBERS];
+struct system_call process_system_calls[NPROC];
+
 
 struct cpu {
 	uchar apicid;								// Local APIC ID

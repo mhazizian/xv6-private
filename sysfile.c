@@ -21,15 +21,52 @@ extern void set_void_argument(int argument_number, int system_call_number);
 extern void set_int_argument(int value, int argument_number,
         int system_call_number);
 
+void swap_syscalls(system_call* s1, system_call* s2)
+{
+	system_call* s3	= s1;
+	s1 = s2;
+	s2 = s3;
+}
+
+
+void reorder_sorted_syscall_by_syscall_num(int pid)
+{
+	int i, j;
+    // struct proc* curproc = myproc();
+    // int pid = curproc->pid;
+	
+
+    struct system_call* system_call_struct = &process_system_calls[pid];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+
+    struct system_call* last_element = &system_call_struct[number_of_calls];
+
+    // Add new syscall struct to the end of sorted_syscalls by time
+    sorted_syscalls.items[sorted_syscalls.number_of_calls] = last_element;
+
+    for(i = 1; i <= number_of_calls; i++)
+    {
+    	if (system_call_struct[i].syscall_number > last_element.syscall_number)
+    		break;
+    }
+    for(j = number_of_calls; j > i; j--)
+    {
+    	swap_syscalls(&system_call_struct[j], &system_call_struct[j - 1]);
+
+    	// correct index
+    	sorted_syscalls.items[system_call_struct[j].index_in_sorted_syscalls_by_time] = &system_call_struct[j];
+    	sorted_syscalls.items[system_call_struct[j - 1].index_in_sorted_syscalls_by_time] = &system_call_struct[j - 1];
+    } 
+}
+
 
 
 void set_charpp_argument(char** value, int argument_number, int system_call_number)
 {
-    struct proc* curproc = myproc();
-    int pid = curproc->pid;
 //    int i, j;
 
-    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
     (*system_call_struct).system_calls[number_of_calls].
@@ -60,7 +97,7 @@ void set_charp_argument(char* value, int argument_number, int system_call_number
     int pid = curproc->pid;
     int i;
 
-    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
     (*system_call_struct).system_calls[number_of_calls].

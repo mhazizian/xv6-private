@@ -13,9 +13,8 @@ set_int_argument(int value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
     int pid = curproc->pid;
-    cprintf("*** %d\n", pid);
 
-    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
 	(*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = INT;
@@ -28,7 +27,7 @@ set_void_argument(int argument_number, int system_call_number)
     struct proc* curproc = myproc();
     int pid = curproc->pid;
 
-    struct system_call* system_call_struct = &process_system_calls[pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
     (*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = VOID;
