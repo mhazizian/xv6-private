@@ -24,8 +24,8 @@ extern void set_int_argument(int value, int argument_number,
 void swap_syscalls(struct system_call_status* s1, struct system_call_status* s2)
 {
 	struct system_call_status* s3	= s1;
-	s1 = s2;
-	s2 = s3;
+	*s1 = *s2;
+	*s2 = *s3;
 }
 
 void config_new_syscall_status(struct system_call_status* new_element, int syscall_id)
