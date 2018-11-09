@@ -20,7 +20,7 @@ enum argument_type {
 
 };
 
-struct argumnet
+struct argument
 {
      enum argument_type type;
      int int_value;
@@ -34,7 +34,7 @@ struct system_call_status {
 	int index_in_sorted_syscalls_by_time;
 
     struct rtcdate time;
-    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
+    struct argument arguments[MAX_ARGUMENTS_NUMBER];
 };
 
 struct system_call {
