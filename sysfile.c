@@ -23,7 +23,7 @@ extern void set_int_argument(int value, int argument_number,
 
 
 
-void set_charpp_argument(char* value, int argument_number, int system_call_number)
+void set_charpp_argument(char** value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
     int pid = curproc->pid;

@@ -4,10 +4,10 @@
 
 #define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
-#define MAX_SYS_CALL_NUMBERS 16
-#define MAX_CHARP_SIZE 16
-#define MAX_CHARPP_SIZE 5
-#define MAX_INTP_SIZE 16
+#define MAX_SYS_CALL_NUMBERS 10
+#define MAX_CHARP_SIZE 10
+#define MAX_CHARPP_SIZE 3
+#define MAX_INTP_SIZE 12
 #define FIRST 0
 #define SECOND 1
 #define THIRD 2
