@@ -67,10 +67,11 @@ void set_charp_argument(char* value, int argument_number, int system_call_number
 
     for (i = 0; i < MAX_CHARP_SIZE; ++i)
     {
-	if (value[i] == '\0')
-	    break;
-	(*system_call_struct).system_calls[number_of_calls].
-	        arguments[argument_number].charp_value[i] = value[i];
+		if (value[i] == '\0') {
+			(*system_call_struct).system_calls[number_of_calls].
+					arguments[argument_number].charp_value[i] = value[i];
+			break;
+		}
     }
 }
 
