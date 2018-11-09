@@ -146,9 +146,10 @@ syscall(void)
         process_system_calls[curproc->pid].number_of_calls++;
 
 //			cmostime(&system_calls[num].time);
-
+        
+		reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
         curproc->tf->eax = syscalls[num]();
-        reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
+        
 
     } else {
 		cprintf("%d %s: unknown sys call %d\n",

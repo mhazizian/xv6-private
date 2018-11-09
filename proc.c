@@ -27,7 +27,7 @@ print_system_call_status(struct system_call_status* s1)
 				cprintf("   |__char*: %s\n", arg.charp_value);
 				break;
 			case CHARPP:
-				cprintf("   |__**: %d \n", arg.pp_value);
+				cprintf("   |__**: %p\n", arg.pp_value);
 				break;
 			default:
 				break;
