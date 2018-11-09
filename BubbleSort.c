@@ -26,8 +26,6 @@ void write_array(char* numbers[])
 	int i = 0;
 	int file_descriptor = open("result.txt", O_CREATE | O_WRONLY);
 	
-	printf(1, "Process ID : %d\n", getpid());
-	
 	if (file_descriptor < 0)
 	{
 		printf(2, "Something went wrong!\nThe program can't open the result.txt file!\n");	

@@ -8,6 +8,36 @@
 #include "spinlock.h"
 #include "syscall.h"
 
+void
+print_system_call_status(struct system_call_status* s1)
+{
+	struct argumnet arg;
+	int j;
+	cprintf("id of syscall:  %d\n", s1->syscall_number);
+	for (j = 0; j < MAX_ARGUMENTS_NUMBER; j++) {
+		arg = s1->arguments[j];
+		switch (arg.type) {
+			case VOID:
+				//                                cprintf("void\n");
+				break;
+			case INT:
+				cprintf("   |__int: %d\n", arg.int_value);
+				break;
+			case CHARP:
+				cprintf("   |__char*: %s\n", arg.charp_value);
+				break;
+			case CHARPP:
+				cprintf("   |__**: %d \n", arg.pp_value);
+				break;
+			default:
+				break;
+		}
+	}
+
+}
+
+
+
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -547,47 +577,20 @@ int invoked_syscalls(int pid)
     {
         if(process->pid == pid) // && !(process->killed)
         {
-            for (i = 0; i < SYS_CALL_NUMBERS; ++i) {
-                if (process_system_calls[pid][i].number_of_calls != 0) {
+			for(i = 1; i <= process_system_calls[pid].number_of_calls; i++) {
+				print_system_call_status(&process_system_calls[pid].system_calls[i]);
 
-                    cprintf("*** System call ID : %d "
-                            "Number of calls : %d Total calls : %d \n",
-                            i, process_system_calls[pid][i].number_of_calls,
-                            system_calls[i]);
-                    for(t = 1; t <= process_system_calls[pid][i].number_of_calls; t++) {
-                        for (j = 0; j < 3; j++) {
-                            arg = process_system_calls[pid][i].system_calls[t].arguments[j];
-                            switch (arg.type) {
-                                case VOID:
-                                    //                                cprintf("void\n");
-                                    break;
-                                case INT:
-                                    cprintf("   |__int: %d\n", arg.int_value);
-                                    break;
-                                case CHARP:
-                                    cprintf("   |__char*: %s\n", arg.charp_value);
-                                    break;
-                                case CHARPP:
-                                    cprintf("   |__**: %d \n", arg.pp_value);
-
-//                                    for (k = 0; k < MAX_CHARPP_SIZE; k++) {
-//                                        if (arg.charpp_value[k] == '\0') {
-//                                            break;
-//                                        }
-//                                        cprintf("  |__%dth char* value is: %s\n", k + 1, arg.charpp_value[k]);
-//                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
+//				cprintf("*** System call ID : %d "
+//						"Number of calls : %d Total calls : %d \n",
+//						i, process_system_calls[pid][i].number_of_calls,
+//						system_calls[i]);
+//				for (t = 1; t <= process_system_calls[pid][i].number_of_calls; t++) {
+//					print_system_call_status()
+//				}
 //                    time = process_system_calls[pid][i].time;
-
-                }
-            }
-            release(&ptable.lock);
-            return 0;
+			}
+			release(&ptable.lock);
+			return 0;
         }
     }
 
