@@ -569,21 +569,38 @@ int invoked_syscalls(int pid)
 {
     struct proc* process;
     int i, j, t;
+    int num_of_syscall;
     struct argument arg;
 //    struct rtcdate time;
 
     acquire(&ptable.lock);
-    for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
-    {
-        if(process->pid == pid) // && !(process->killed)
-        {
-        	cprintf("list of system_calls related to pid: %d\n", pid);
-			for(i = 1; i <= process_system_calls[pid].number_of_calls; i++)
-				print_system_call_status(&process_system_calls[pid].system_calls[i]);
-			release(&ptable.lock);
-			return 0;
-        }
-    }
+
+    // for SYS_log_syscalls():
+	num_of_syscall = sorted_syscalls.number_of_calls; 
+	cprintf("########################    num_of_syscall: %d\n", num_of_syscall);
+    	for(i = 0; i < num_of_syscall; i++)
+    	{
+    		// cprintf("i: %d, syscall_id: %d, pid: %d\n",
+    		// 	i,
+    		// 	sorted_syscalls.items[i]->syscall_number,
+    		// 	sorted_syscalls.items[i]->pid);
+    		print_system_call_status(sorted_syscalls.items[i]);
+    	}
+
+
+	// for SYS_invoked_syscalls(int pid):
+
+	//  for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
+	//  {
+	//      if(process->pid == pid) // && !(process->killed)
+	//      {
+	//      	cprintf("list of system_calls related to pid: %d\n", pid);
+			// for(i = 1; i <= process_system_calls[pid].number_of_calls; i++)
+			// 	print_system_call_status(&process_system_calls[pid].system_calls[i]);
+			// release(&ptable.lock);
+			// return 0;
+	//      }
+	//  }
 
     cprintf("Process not found!\n");
     release(&ptable.lock);

@@ -28,13 +28,14 @@ void swap_syscalls(struct system_call_status* s1, struct system_call_status* s2)
 	*s2 = *s3;
 }
 
-void config_new_syscall_status(struct system_call_status* new_element, int syscall_id)
+void config_new_syscall_status(struct system_call_status* new_element, int syscall_id, int pid)
 {
     // Add new syscall struct to the end of sorted_syscalls by time
     sorted_syscalls.items[sorted_syscalls.number_of_calls] = new_element;
 
     new_element->index_in_sorted_syscalls_by_time = sorted_syscalls.number_of_calls;
     new_element->syscall_number = syscall_id;
+    new_element->pid = pid;
 
 	sorted_syscalls.number_of_calls++;
 
@@ -52,7 +53,7 @@ void reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
     int number_of_calls = process_system_calls[pid].number_of_calls;
 
     struct system_call_status* last_element = &system_call_status_struct[number_of_calls];
-    config_new_syscall_status(last_element, syscall_id);
+    config_new_syscall_status(last_element, syscall_id, pid);
 
 	for(i = 1; i <= number_of_calls; i++)
     {

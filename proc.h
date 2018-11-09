@@ -38,6 +38,7 @@ struct argument
 
 struct system_call_status {
 	int syscall_number;												// ID of system call
+	int pid;														// ID of process related to this system_call
 	int index_in_sorted_syscalls_by_time;							// index of this system_call in sorted_syscalls
 																	//wich is sorted by time of user
 
@@ -67,14 +68,14 @@ struct system_call process_system_calls[NPROC];
 
 
 struct cpu {
-	uchar apicid;								// Local APIC ID
-	struct context *scheduler;	 // swtch() here to enter scheduler
-	struct taskstate ts;				 // Used by x86 to find stack for interrupt
-	struct segdesc gdt[NSEGS];	 // x86 global descriptor table
-	volatile uint started;			 // Has the CPU started?
-	int ncli;										// Depth of pushcli nesting.
-	int intena;									// Were interrupts enabled before pushcli?
-	struct proc *proc;					 // The process running on this cpu or null
+	uchar apicid;								 // Local APIC ID
+	struct context *scheduler;					 // swtch() here to enter scheduler
+	struct taskstate ts;						 // Used by x86 to find stack for interrupt
+	struct segdesc gdt[NSEGS];					 // x86 global descriptor table
+	volatile uint started;						 // Has the CPU started?
+	int ncli;									 // Depth of pushcli nesting.
+	int intena;								 	 // Were interrupts enabled before pushcli?
+	struct proc *proc;							 // The process running on this cpu or null
 };
 
 extern struct cpu cpus[NCPU];
