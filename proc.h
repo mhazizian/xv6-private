@@ -37,12 +37,12 @@ struct argument
 
 
 struct system_call_status {
-	int syscall_number;									// ID of system call
-	int index_in_sorted_syscalls_by_time;				// index of this system_call in sorted_syscalls
-														//wich is sorted by time of user
+	int syscall_number;												// ID of system call
+	int index_in_sorted_syscalls_by_time;							// index of this system_call in sorted_syscalls
+																	//wich is sorted by time of user
 
-    struct rtcdate time;								
-    struct argument arguments[MAX_ARGUMENTS_NUMBER];	// system_call arguments
+    struct rtcdate time;											// system_call used time
+    struct argument arguments[MAX_ARGUMENTS_NUMBER];				// system_call arguments
 };
 
 // used to store array if system_call_status

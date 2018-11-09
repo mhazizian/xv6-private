@@ -577,18 +577,9 @@ int invoked_syscalls(int pid)
     {
         if(process->pid == pid) // && !(process->killed)
         {
-			for(i = 1; i <= process_system_calls[pid].number_of_calls; i++) {
+        	cprintf("list of system_calls related to pid: %d\n", pid);
+			for(i = 1; i <= process_system_calls[pid].number_of_calls; i++)
 				print_system_call_status(&process_system_calls[pid].system_calls[i]);
-
-//				cprintf("*** System call ID : %d "
-//						"Number of calls : %d Total calls : %d \n",
-//						i, process_system_calls[pid][i].number_of_calls,
-//						system_calls[i]);
-//				for (t = 1; t <= process_system_calls[pid][i].number_of_calls; t++) {
-//					print_system_call_status()
-//				}
-//                    time = process_system_calls[pid][i].time;
-			}
 			release(&ptable.lock);
 			return 0;
         }
