@@ -4,19 +4,19 @@ sys_wait : void // DONE
 sys_kill : int pid // DONE
 sys_getpid : void // DONE
 sys_sbrk : int n // DONE
-sys_sleep : void *chan, struct spinlock *lk
+sys_sleep : void *chan, struct spinlock *lk // DONE
 sys_uptime : void // DONE
-sys_dup : struct file* f
-sys_read : struct file*, char*, int n
-sys_write :struct file*, char*, int n
-sys_close : struct file*
-sys_fstat : struct file*, struct stat*
-sys_link : char name[DIRSIZ], *new, *old
-sys_unlink : char name[DIRSIZ], *path
+sys_dup : struct file* f // DONE
+sys_read : struct file*, char*, int n // DONE
+sys_write :struct file*, char*, int n // DONE
+sys_close : struct file* // DONE
+sys_fstat : struct file*, struct stat* // DONE
+sys_link : char* new, *old // DONE
+sys_unlink : char* path // DONE
 sys_open : char *path, int omode // DONE
 sys_mkdir : char *path // DONE
 sys_mknod : char *path, int major, minor // DONE
 sys_chdir : char *path // DONE
 sys_exec :  exec(char*, char**) // char* : DONE
-sys_pipe : int *fd
+sys_pipe : int *fd // DONE
 sys_invoke_system_calls : int pid // DONE

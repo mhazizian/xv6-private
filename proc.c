@@ -21,33 +21,34 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
-        "empty",
-        "fork",
-        "exit",
-        "wait",
-        "pipe",
-        "read",
-        "kill",
-        "exec",
-        "fstat",
-        "chdir",
-        "dup",
-        "getpid",
-        "sbrk",
-        "sleep",
-        "uptime",
-        "open",
-        "write",
-        "mknod",
-        "unlink",
-        "link",
-        "mkdir",
-        "close",
-        "invoked_syscalls",
-        "log_syscalls",
-        "sort_syscalls",
-        "get_count"
+char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] =
+{
+"empty",
+"fork",
+"exit",
+"wait",
+"pipe",
+"read",
+"kill",
+"exec",
+"fstat",
+"chdir",
+"dup",
+"getpid",
+"sbrk",
+"sleep",
+"uptime",
+"open",
+"write",
+"mknod",
+"unlink",
+"link",
+"mkdir",
+"close",
+"invoked_syscalls",
+"log_syscalls",
+"sort_syscalls",
+"get_count"
 };
 
 void
@@ -59,16 +60,16 @@ print_arguments(struct system_call_status* system_call)
 	arg = system_call->arguments[j];
 	switch (arg.type) {
 	    case VOID:
-		    return;
+		return;
 	    case INT:
-		    cprintf("    |__ int: %d\n", arg.int_value);
-		    break;
+		cprintf("    |__ int: %d\n", arg.int_value);
+		break;
 	    case CHARP:
-		    cprintf("    |__ char*: %s\n", arg.charp_value);
-		    break;
+		cprintf("    |__ char*: %s\n", arg.charp_value);
+		break;
 	    case POINTER:
-		    cprintf("    |__ *: %p\n", arg.pp_value);
-		    break;
+		cprintf("    |__ *: %p\n", arg.p_value);
+		break;
 	    default:
 		    break;
 	}
@@ -622,7 +623,7 @@ invoked_syscalls(int pid)
 		    if (last_system_call != EMPTY)
 			cprintf("\nNumber of Calls: %d\n"
 			        "*********************\n", number_of_calls);
-
+		    number_of_calls = ZERO;
 		    last_system_call = process_system_calls[pid].
 		            system_calls[i].syscall_number;
 		}

@@ -8,6 +8,9 @@
 #include "proc.h"
 #include "syscall.h"
 
+extern void set_pointer_argument(uint value, int argument_number,
+        int system_call_number);
+
 void
 set_int_argument(int value, int argument_number, int system_call_number)
 {
@@ -106,14 +109,15 @@ sys_sleep(void)
 	acquire(&tickslock);
 	ticks0 = ticks;
 	while(ticks - ticks0 < n){
-		if(myproc()->killed){
-			release(&tickslock);
+	        if(myproc()->killed){
+		        release(&tickslock);
 			return -1;
 		}
 		sleep(&ticks, &tickslock);
 	}
 	release(&tickslock);
-
+	set_pointer_argument((uint)&ticks, FIRST, SYS_sleep);
+	set_pointer_argument((uint)&tickslock, SECOND, SYS_sleep);
 	return 0;
 }
 
