@@ -15,22 +15,22 @@ char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
         "wait",
         "pipe",
         "read",
-        "write",
-        "close",
         "kill",
         "exec",
-        "open",
-        "mknod",
-        "unlink",
         "fstat",
-        "link",
-        "mkdir",
         "chdir",
         "dup",
         "getpid",
         "sbrk",
         "sleep",
         "uptime",
+        "open",
+        "write",
+        "mknod",
+        "unlink",
+        "link",
+        "mkdir",
+        "close",
         "invoked_syscalls",
         "log_syscalls",
         "sort_syscalls",
@@ -38,31 +38,34 @@ char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
 };
 
 void
-print_system_call_status(struct system_call_status* s1)
+print_system_call_status(struct system_call_status* system_call)
 {
 	struct argument arg;
 	int j;
-	cprintf("id: %d, name: %s\n", s1->syscall_number, system_call_name[s1->syscall_number]);
+	cprintf("System Call Name: %s - Call Time: %d:%d:%d\n"
+	        " - PID: %d", system_call_name[system_call->syscall_number],
+	        system_call->time.hour, system_call->time.minute,
+	        system_call->time.second, system_call->pid);
+
 	for (j = 0; j < MAX_ARGUMENTS_NUMBER; j++) {
-		arg = s1->arguments[j];
+	        arg = system_call->arguments[j];
 		switch (arg.type) {
-			case VOID:
-				//                                cprintf("void\n");
-				break;
-			case INT:
-				cprintf("   |__int: %d\n", arg.int_value);
-				break;
-			case CHARP:
-				cprintf("   |__char*: %s\n", arg.charp_value);
-				break;
-			case CHARPP:
-				cprintf("   |__**: %p\n", arg.pp_value);
-				break;
-			default:
-				break;
+		        case VOID:
+			        //                                cprintf("void\n");
+			        break;
+		        case INT:
+			        cprintf("   |__int: %d\n", arg.int_value);
+			        break;
+		        case CHARP:
+			        cprintf("   |__char*: %s\n", arg.charp_value);
+			        break;
+		        case CHARPP:
+			        cprintf("   |__**: %p\n", arg.pp_value);
+			        break;
+		        default:
+			        break;
 		}
 	}
-
 }
 
 
@@ -625,18 +628,13 @@ int
 log_syscalls(void)
 {
     int i;
-    int num_of_syscall;
-
-    num_of_syscall = sorted_syscalls.number_of_calls;
-    cprintf("########################    num_of_syscall: %d\n", num_of_syscall);
-    for(i = 0; i < num_of_syscall; i++)
-    {
-	    // cprintf("i: %d, syscall_id: %d, pid: %d\n",
-	    // 	i,
-	    // 	sorted_syscalls.items[i]->syscall_number,
-	    // 	sorted_syscalls.items[i]->pid);
-	    print_system_call_status(sorted_syscalls.items[i]);
-    }
+    for(i = FIRST; i < sorted_syscalls.number_of_calls; i++)
+	cprintf("System Call Name: %s - Call Time: %d:%d:%d - PID: %d\n",
+	        system_call_name[sorted_syscalls.items[i]->syscall_number],
+	        sorted_syscalls.items[i]->time.hour,
+	        sorted_syscalls.items[i]->time.minute,
+	        sorted_syscalls.items[i]->time.second,
+	        sorted_syscalls.items[i]->pid);
     return 0;
 }
 

@@ -50,9 +50,9 @@ struct system_call {
     struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS]; 	// One based array
 };
 
-// array of pointer to system_call_status
-// used to store system_call status in order of usage time
-// number of stored system_call_status objects is stored in number_of_calls 
+// Array of pointer to system_call_status
+// It used to store system_call status in the order of usage time
+// Number of stored system_call_status objects is stored in number_of_calls
 struct array_of_syscall_pointer {
     int number_of_calls;
     struct system_call_status* items[NPROC * MAX_SYS_CALL_NUMBERS];
