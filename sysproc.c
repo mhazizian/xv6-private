@@ -17,8 +17,11 @@ set_int_argument(int value, int argument_number, int system_call_number)
     struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
-	(*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = INT;
-	(*system_call_struct).system_calls[number_of_calls].arguments[argument_number].int_value = value;
+    (*system_call_struct).system_calls[number_of_calls].number_of_arguments++;
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].type = INT;
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].int_value = value;
 }
 
 void
@@ -30,6 +33,7 @@ set_void_argument(int argument_number, int system_call_number)
     struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
+    (*system_call_struct).system_calls[number_of_calls].number_of_arguments++;
     (*system_call_struct).system_calls[number_of_calls].arguments[argument_number].type = VOID;
 }
 
@@ -82,10 +86,10 @@ sys_sbrk(void)
 	int n;
 
 	if(argint(0, &n) < 0)
-		return -1;
+	        return -1;
 	addr = myproc()->sz;
 	if(growproc(n) < 0)
-		return -1;
+	        return -1;
 
 	set_int_argument(n, FIRST, SYS_sbrk);
 	return addr;

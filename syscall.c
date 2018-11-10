@@ -140,31 +140,28 @@ static int (*syscalls[])(void) = {
 void
 syscall(void)
 {
-	int num;
-	struct proc *curproc = myproc();
-	struct rtcdate* sys_call_time;
-	int number_of_calls_in_process;
-//    char *sss =(char*) malloc(1);
-//    cprintf("%s", sss);
-	num = curproc->tf->eax;
-	if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-//        cprintf("This is num: %d  \n", num);
+    int num;
+    struct proc *curproc = myproc();
+    struct rtcdate* sys_call_time;
+    int number_of_calls_in_process;
+    num = curproc->tf->eax;
 
-        system_calls[num]++;
-        process_system_calls[curproc->pid].number_of_calls++;
-	number_of_calls_in_process =
-	        process_system_calls[curproc->pid].number_of_calls;
+    if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+	system_calls[num]++;
+	process_system_calls[curproc->pid].number_of_calls++;
+	number_of_calls_in_process =  process_system_calls[curproc->pid].
+	        number_of_calls;
 
 	sys_call_time = &process_system_calls[curproc->pid].
 	        system_calls[number_of_calls_in_process].time;
 	cmostime(sys_call_time);
-        
+
 	reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
-        curproc->tf->eax = syscalls[num]();
-        
-    } else {
-		cprintf("%d %s: unknown sys call %d\n",
-						curproc->pid, curproc->name, num);
-		curproc->tf->eax = -1;
-	}
+	curproc->tf->eax = syscalls[num]();
+    }
+    else {
+	cprintf("%d %s: unknown sys call %d\n",
+	        curproc->pid, curproc->name, num);
+	curproc->tf->eax = -1;
+    }
 }

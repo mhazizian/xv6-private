@@ -2,35 +2,38 @@
 #include "date.h"
 // Per-CPU state
 
+// The SYS_CALL_NUMBERS is one more than number of system calls
+#define SYS_CALL_NUMBERS 26
 #define MAX_SYSTEM_CALL_NAME_SIZE 32
-#define SYS_CALL_NUMBERS 26 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 220
 #define MAX_CHARP_SIZE 10
 #define MAX_CHARPP_SIZE 3
+#define SUCCESSFUL 0
+#define EMPTY -1
 #define FIRST 0
 #define SECOND 1
 #define THIRD 2
+#define ZERO 0
+#define ONE 1
 
 enum argument_type {
-    VOID,
+    VOID = 0,
     INT,
     CHARP,
-    CHARPP
+    POINTER
 };
 
-// for saving all arguments passed to a system_call
+// It has been used to save all arguments passed to a system_call
 // type of arguments is stored in argument_type
 // int_value is used for storing int agruments
 // charp_value is used for storing char* and strings
 // all other values of type pointer is stored in pp_value.
-struct argument
-{
+struct argument {
      enum argument_type type;
      int int_value;
      char charp_value[MAX_CHARP_SIZE];
      uint pp_value;
-//     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
 };
 
 struct system_call_status {
@@ -39,26 +42,30 @@ struct system_call_status {
     // index of this system_call in sorted_syscalls which is sorted by time of user
     int index_in_sorted_syscalls_by_time;
     struct rtcdate time;	// system_call used time
+
+    int number_of_arguments;
     struct argument arguments[MAX_ARGUMENTS_NUMBER];	    // system_call arguments
 };
 
-// used to store array if system_call_status
-// number of stored system_call_status objects is stored in number_of_calls
+// It has been used to store array of system_call_status
+// Number of stored system_call_status objects is stored in number_of_calls
 // system_calls is One based.
 struct system_call {
     int number_of_calls;
-    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS]; 	// One based array
+
+    // The 1-based array has been used to be compatible with number of system calls
+    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS];
 };
 
 // Array of pointer to system_call_status
-// It used to store system_call status in the order of usage time
+// It has been used to store system_call status in the order of usage time
 // Number of stored system_call_status objects is stored in number_of_calls
 struct array_of_syscall_pointer {
     int number_of_calls;
     struct system_call_status* items[NPROC * MAX_SYS_CALL_NUMBERS];
 } sorted_syscalls;
 
-
+// The 1-based array has been used to be compatible with system call number
 int system_calls[SYS_CALL_NUMBERS];
 struct system_call process_system_calls[NPROC];
 

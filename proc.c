@@ -8,6 +8,19 @@
 #include "spinlock.h"
 #include "syscall.h"
 
+struct {
+        struct spinlock lock;
+	struct proc proc[NPROC];
+} ptable;
+
+static struct proc *initproc;
+
+int nextpid = 1;
+extern void forkret(void);
+extern void trapret(void);
+
+static void wakeup1(void *chan);
+
 char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
         "empty",
         "fork",
@@ -38,50 +51,40 @@ char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
 };
 
 void
-print_system_call_status(struct system_call_status* system_call)
+print_arguments(struct system_call_status* system_call)
 {
-	struct argument arg;
-	int j;
-	cprintf("System Call Name: %s - Call Time: %d:%d:%d\n"
-	        " - PID: %d", system_call_name[system_call->syscall_number],
-	        system_call->time.hour, system_call->time.minute,
-	        system_call->time.second, system_call->pid);
-
-	for (j = 0; j < MAX_ARGUMENTS_NUMBER; j++) {
-	        arg = system_call->arguments[j];
-		switch (arg.type) {
-		        case VOID:
-			        //                                cprintf("void\n");
-			        break;
-		        case INT:
-			        cprintf("   |__int: %d\n", arg.int_value);
-			        break;
-		        case CHARP:
-			        cprintf("   |__char*: %s\n", arg.charp_value);
-			        break;
-		        case CHARPP:
-			        cprintf("   |__**: %p\n", arg.pp_value);
-			        break;
-		        default:
-			        break;
-		}
+    struct argument arg;
+    int j;
+    for (j = 0; j < system_call->number_of_arguments; j++) {
+	arg = system_call->arguments[j];
+	switch (arg.type) {
+	    case VOID:
+		    return;
+	    case INT:
+		    cprintf("    |__ int: %d\n", arg.int_value);
+		    break;
+	    case CHARP:
+		    cprintf("    |__ char*: %s\n", arg.charp_value);
+		    break;
+	    case POINTER:
+		    cprintf("    |__ *: %p\n", arg.pp_value);
+		    break;
+	    default:
+		    break;
 	}
+    }
 }
 
-
-
-struct {
-	struct spinlock lock;
-	struct proc proc[NPROC];
-} ptable;
-
-static struct proc *initproc;
-
-int nextpid = 1;
-extern void forkret(void);
-extern void trapret(void);
-
-static void wakeup1(void *chan);
+void
+print_system_call_status(struct system_call_status* system_call)
+{
+        cprintf("\nSystem Call ID: %d , System Call Name: %s , "
+	        "Call Time: %d:%d:%d\n", system_call->syscall_number,
+	        system_call_name[system_call->syscall_number],
+	        system_call->time.hour, system_call->time.minute,
+	        system_call->time.second);
+	print_arguments(system_call);
+}
 
 void
 pinit(void)
@@ -602,26 +605,43 @@ invoked_syscalls(int pid)
 {
     struct proc* process;
     int i;
-//    struct rtcdate time;
+    int last_system_call = EMPTY;
+    int number_of_calls = ZERO;
 
     acquire(&ptable.lock);
 
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
     {
-      if(process->pid == pid) // && !(process->killed)
-      {
-	cprintf("list of system_calls related to pid: %d\n", pid);
-	         for(i = 1; i <= process_system_calls[pid].number_of_calls; i++)
-		        print_system_call_status(&process_system_calls[pid].system_calls[i]);
-		 release(&ptable.lock);
-		 return 0;
-      }
+	if(process->pid == pid)
+	{
+	    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
+	    {
+		if (last_system_call != process_system_calls[pid].
+		        system_calls[i].syscall_number)
+		{
+		    if (last_system_call != EMPTY)
+			cprintf("\nNumber of Calls: %d\n"
+			        "*********************\n", number_of_calls);
+
+		    last_system_call = process_system_calls[pid].
+		            system_calls[i].syscall_number;
+		}
+		print_system_call_status(&process_system_calls[pid].
+		        system_calls[i]);
+		number_of_calls++;
+	    }
+	    if (last_system_call != EMPTY)
+		cprintf("\nNumber of Calls: %d\n"
+		        "*********************\n", number_of_calls);
+
+	    release(&ptable.lock);
+	    return 0;
+	}
     }
 
     cprintf("Process not found!\n");
     release(&ptable.lock);
-    return 3;
-
+    return SUCCESSFUL;
 }
 
 int
@@ -641,6 +661,7 @@ log_syscalls(void)
 int
 sort_syscalls(int pid)
 {
+    // It is already done!
     return 0;
 }
 
