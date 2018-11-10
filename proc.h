@@ -3,7 +3,7 @@
 // Per-CPU state
 
 #define MAX_SYSTEM_CALL_NAME_SIZE 32
-#define SYS_CALL_NUMBERS 24 /// @todo move this to appropriate place
+#define SYS_CALL_NUMBERS 26 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 220
 #define MAX_CHARP_SIZE 10

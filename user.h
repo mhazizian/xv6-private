@@ -28,6 +28,8 @@ int sleep(int);
 int uptime(void);
 int invoked_syscalls(int);
 int log_syscalls(void);
+int sort_syscalls(int);
+int get_count(int, int);
 
 // ulib.c
 int stat(const char*, struct stat*);

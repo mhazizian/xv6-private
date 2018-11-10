@@ -32,7 +32,9 @@ char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
         "sleep",
         "uptime",
         "invoked_syscalls",
-        "log_syscalls"
+        "log_syscalls",
+        "sort_syscalls",
+        "get_count"
 };
 
 void
@@ -635,5 +637,17 @@ log_syscalls(void)
 	    // 	sorted_syscalls.items[i]->pid);
 	    print_system_call_status(sorted_syscalls.items[i]);
     }
+    return 0;
+}
+
+int
+sort_syscalls(int pid)
+{
+    return 0;
+}
+
+int
+get_count(int pid, int sysnum)
+{
     return 0;
 }

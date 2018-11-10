@@ -104,6 +104,8 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_invoked_syscalls(void);
 extern int sys_log_syscalls(void);
+extern int sys_sort_syscalls(void);
+extern int sys_get_count(void);
 
 extern void reorder_sorted_syscall_by_syscall_num(int, int);
 
@@ -130,7 +132,9 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]	 sys_mkdir,
 [SYS_close]	 sys_close,
 [SYS_invoked_syscalls]		sys_invoked_syscalls,
-[SYS_log_syscalls]	sys_log_syscalls
+[SYS_log_syscalls]	sys_log_syscalls,
+[SYS_sort_syscalls]	sys_sort_syscalls,
+[SYS_get_count]		sys_get_count
 };
 
 void
@@ -138,6 +142,8 @@ syscall(void)
 {
 	int num;
 	struct proc *curproc = myproc();
+	struct rtcdate* sys_call_time;
+	int number_of_calls_in_process;
 //    char *sss =(char*) malloc(1);
 //    cprintf("%s", sss);
 	num = curproc->tf->eax;
@@ -146,13 +152,16 @@ syscall(void)
 
         system_calls[num]++;
         process_system_calls[curproc->pid].number_of_calls++;
+	number_of_calls_in_process =
+	        process_system_calls[curproc->pid].number_of_calls;
 
-//			cmostime(&system_calls[num].time);
+	sys_call_time = &process_system_calls[curproc->pid].
+	        system_calls[number_of_calls_in_process].time;
+	cmostime(sys_call_time);
         
-		reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
+	reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
         curproc->tf->eax = syscalls[num]();
         
-
     } else {
 		cprintf("%d %s: unknown sys call %d\n",
 						curproc->pid, curproc->name, num);

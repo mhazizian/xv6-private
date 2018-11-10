@@ -37,10 +37,8 @@ void config_new_syscall_status(struct system_call_status* new_element, int sysca
     new_element->syscall_number = syscall_id;
     new_element->pid = pid;
 
-	sorted_syscalls.number_of_calls++;
-
+    sorted_syscalls.number_of_calls++;
 }
-
 
 void reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
 {

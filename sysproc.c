@@ -144,3 +144,28 @@ sys_log_syscalls(void)
 {
     return log_syscalls();
 }
+
+int
+sys_sort_syscalls(void)
+{
+    int pid;
+    if(argint(0, &pid) < 0)
+	    return -1;
+
+    set_int_argument(pid, FIRST, SYS_sort_syscalls);
+    return sort_syscalls(pid);
+}
+
+int
+sys_get_count(void)
+{
+    int pid;
+    int sysnum;
+
+    if((argint(0, &pid) < 0) || (argint(0, &sysnum) < 0))
+	    return -1;
+
+    set_int_argument(pid, FIRST, SYS_get_count);
+    set_int_argument(sysnum, SECOND, SYS_get_count);
+    return get_count(pid, sysnum);
+}

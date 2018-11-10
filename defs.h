@@ -122,6 +122,8 @@ void						wakeup(void*);
 void						yield(void);
 int						invoked_syscalls(int);
 int						log_syscalls(void);
+int						sort_syscalls(int);
+int						get_count(int, int);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
