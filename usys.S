@@ -30,3 +30,4 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 SYSCALL(invoked_syscalls);
+SYSCALL(log_syscalls);

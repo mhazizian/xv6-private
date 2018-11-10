@@ -2,12 +2,12 @@
 #include "date.h"
 // Per-CPU state
 
-#define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
+#define MAX_SYSTEM_CALL_NAME_SIZE 32
+#define SYS_CALL_NUMBERS 24 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 220
 #define MAX_CHARP_SIZE 10
 #define MAX_CHARPP_SIZE 3
-#define MAX_INTP_SIZE 12
 #define FIRST 0
 #define SECOND 1
 #define THIRD 2
@@ -17,7 +17,6 @@ enum argument_type {
     INT,
     CHARP,
     CHARPP
-
 };
 
 // for saving all arguments passed to a system_call
@@ -34,16 +33,13 @@ struct argument
 //     char charpp_value[MAX_CHARPP_SIZE][MAX_CHARP_SIZE];
 };
 
-
-
 struct system_call_status {
-	int syscall_number;												// ID of system call
-	int pid;														// ID of process related to this system_call
-	int index_in_sorted_syscalls_by_time;							// index of this system_call in sorted_syscalls
-																	//wich is sorted by time of user
-
-    struct rtcdate time;											// system_call used time
-    struct argument arguments[MAX_ARGUMENTS_NUMBER];				// system_call arguments
+    int syscall_number;	    // ID of system call
+    int pid;	// ID of process related to this system_call
+    // index of this system_call in sorted_syscalls which is sorted by time of user
+    int index_in_sorted_syscalls_by_time;
+    struct rtcdate time;	// system_call used time
+    struct argument arguments[MAX_ARGUMENTS_NUMBER];	    // system_call arguments
 };
 
 // used to store array if system_call_status
@@ -65,7 +61,6 @@ struct array_of_syscall_pointer {
 
 int system_calls[SYS_CALL_NUMBERS];
 struct system_call process_system_calls[NPROC];
-
 
 struct cpu {
 	uchar apicid;								 // Local APIC ID

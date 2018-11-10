@@ -21,4 +21,4 @@
 #define SYS_mkdir	20
 #define SYS_close	21
 #define SYS_invoked_syscalls	22
-
+#define SYS_log_syscalls	23

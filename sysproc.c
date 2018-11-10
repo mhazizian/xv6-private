@@ -139,3 +139,8 @@ sys_invoked_syscalls(void)
     return invoked_syscalls(pid);
 }
 
+int
+sys_log_syscalls(void)
+{
+    return log_syscalls();
+}

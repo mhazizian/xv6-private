@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
 	{
 		bubble_sort(&argv[1]);
 		write_array(&argv[1]);
-		invoked_syscalls(getpid());
+//		invoked_syscalls(getpid());
+		log_syscalls();
 		exit();
 	}
 	else
