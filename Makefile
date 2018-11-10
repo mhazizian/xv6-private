@@ -181,6 +181,7 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_BubbleSort\
+	_sort_syscalls\
 	_log_syscalls\
 	_invoked_sys\
 	_zombie\
@@ -254,8 +255,8 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c BubbleSort.c log_syscalls.c invoked_sys.c\
-	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
-	.gdbinit.tmpl gdbutil\
+	sort_syscalls.c README dot-bochsrc *.pl toc.* runoff runoff1\
+	runoff.list\ .gdbinit.tmpl gdbutil\
 
 dist:
 	rm -rf dist

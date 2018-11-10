@@ -642,7 +642,7 @@ invoked_syscalls(int pid)
 
     cprintf("Process not found!\n");
     release(&ptable.lock);
-    return SUCCESSFUL;
+    return 0;
 }
 
 int
@@ -662,8 +662,15 @@ log_syscalls(void)
 int
 sort_syscalls(int pid)
 {
-    // It is already done!
-    return 0;
+    struct proc* process;
+
+    for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
+	if(process->pid == pid)
+	// It is already done when the program called the new system call
+	    return 0;
+
+    cprintf("Process not found!\n");
+    return 1;
 }
 
 int
