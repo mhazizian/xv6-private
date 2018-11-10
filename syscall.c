@@ -106,6 +106,7 @@ extern int sys_invoked_syscalls(void);
 extern int sys_log_syscalls(void);
 extern int sys_sort_syscalls(void);
 extern int sys_get_count(void);
+extern int sys_inc_num(void);
 
 extern void reorder_sorted_syscall_by_syscall_num(int, int);
 
@@ -134,7 +135,8 @@ static int (*syscalls[])(void) = {
 [SYS_invoked_syscalls]		sys_invoked_syscalls,
 [SYS_log_syscalls]	sys_log_syscalls,
 [SYS_sort_syscalls]	sys_sort_syscalls,
-[SYS_get_count]		sys_get_count
+[SYS_get_count]		sys_get_count,
+[SYS_inc_num]       sys_inc_num,
 };
 
 void

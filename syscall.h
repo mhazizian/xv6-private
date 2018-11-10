@@ -24,3 +24,4 @@
 #define SYS_log_syscalls	23
 #define SYS_sort_syscalls	24
 #define SYS_get_count		25
+#define SYS_inc_num         26

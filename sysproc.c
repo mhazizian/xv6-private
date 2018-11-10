@@ -173,3 +173,13 @@ sys_get_count(void)
     set_int_argument(sysnum, SECOND, SYS_get_count);
     return get_count(pid, sysnum);
 }
+
+int
+sys_inc_num(void)
+{
+//    struct proc *curproc = myproc();
+//    uint esp = curproc->tf->esp;
+    int arg = 3;
+    set_int_argument(arg, FIRST, SYS_inc_num);
+    return inc_num(arg);
+}

@@ -30,6 +30,7 @@ int invoked_syscalls(int);
 int log_syscalls(void);
 int sort_syscalls(int);
 int get_count(int, int);
+int inc_num(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

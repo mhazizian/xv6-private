@@ -33,3 +33,4 @@ SYSCALL(invoked_syscalls);
 SYSCALL(log_syscalls);
 SYSCALL(sort_syscalls);
 SYSCALL(get_count);
+SYSCALL(inc_num);

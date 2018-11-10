@@ -47,7 +47,8 @@ char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
         "invoked_syscalls",
         "log_syscalls",
         "sort_syscalls",
-        "get_count"
+        "get_count",
+        "inc_num",
 };
 
 void
@@ -669,4 +670,11 @@ int
 get_count(int pid, int sysnum)
 {
     return 0;
+}
+
+int
+inc_num(int num)
+{
+
+	return 3;
 }

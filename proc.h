@@ -3,7 +3,7 @@
 // Per-CPU state
 
 // The SYS_CALL_NUMBERS is one more than number of system calls
-#define SYS_CALL_NUMBERS 26
+#define SYS_CALL_NUMBERS 27
 #define MAX_SYSTEM_CALL_NAME_SIZE 32
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 220
