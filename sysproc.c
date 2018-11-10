@@ -181,9 +181,15 @@ sys_get_count(void)
 int
 sys_inc_num(void)
 {
-//    struct proc *curproc = myproc();
-//    uint esp = curproc->tf->esp;
-    int arg = 3;
+    struct proc *curproc = myproc();
+    int arg, inc_num_output;
+    if(argint(0, &arg) < 0)
+        return -1;
+    uint ebp = curproc->tf->ebp;
+    curproc->tf->ebp = arg;
+
     set_int_argument(arg, FIRST, SYS_inc_num);
-    return inc_num(arg);
+    inc_num_output = inc_num(arg);
+    curproc->tf->ebp = ebp;
+    return inc_num_output;
 }

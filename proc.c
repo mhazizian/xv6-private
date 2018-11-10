@@ -681,8 +681,10 @@ get_count(int pid, int sysnum)
 }
 
 int
-inc_num(int num)
+inc_num()
 {
-
-	return 3;
+    struct proc *curproc = myproc();
+	int num = curproc->tf->ebp;
+	cprintf("%d\n", num + 1);
+	return num + 1;
 }
