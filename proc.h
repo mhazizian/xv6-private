@@ -7,7 +7,7 @@
 #define MAX_SYSTEM_CALL_NAME_SIZE 32
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 220
-#define MAX_CHARP_SIZE 10
+#define MAX_CHARP_SIZE 20
 #define MAX_CHARPP_SIZE 3
 #define SUCCESSFUL 0
 #define EMPTY -1
@@ -33,7 +33,7 @@ struct argument {
      enum argument_type type;
      int int_value;
      char charp_value[MAX_CHARP_SIZE];
-     uint pp_value;
+     uint p_value;
 };
 
 struct system_call_status {

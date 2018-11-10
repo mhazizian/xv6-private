@@ -78,13 +78,11 @@ reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
     }
 }
 
-
-
-void set_pp_argument(uint value, int argument_number, int system_call_number)
+void
+set_pointer_argument(uint value, int argument_number, int system_call_number)
 {
-//    int i, j;
- 	struct proc* curproc = myproc();
- 	int pid = curproc->pid;
+    struct proc* curproc = myproc();
+    int pid = curproc->pid;
 
     struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
@@ -94,11 +92,11 @@ void set_pp_argument(uint value, int argument_number, int system_call_number)
             arguments[argument_number].type = POINTER;
 
     (*system_call_struct).system_calls[number_of_calls].
-            arguments[argument_number].pp_value = (uint) value;
+            arguments[argument_number].p_value = value;
 }
 
-
-void set_charp_argument(char* value, int argument_number, int system_call_number)
+void
+set_charp_argument(char* value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
     int pid = curproc->pid;
@@ -166,6 +164,8 @@ sys_dup(void)
 		return -1;
 	if((fd=fdalloc(f)) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_dup);
 	filedup(f);
 	return fd;
 }
@@ -180,10 +180,9 @@ sys_read(void)
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
 
-	set_pp_argument((uint)f, FIRST, SYS_write);
+	set_pointer_argument((uint)f, FIRST, SYS_write);
 	set_charp_argument(p, SECOND, SYS_write);
 	set_int_argument(n, THIRD, SYS_write);
-
 
 	return fileread(f, p, n);
 }
@@ -198,10 +197,9 @@ sys_write(void)
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
 
-	set_pp_argument((uint)f, FIRST, SYS_write);
+	set_pointer_argument((uint)f, FIRST, SYS_write);
 	set_charp_argument(p, SECOND, SYS_write);
 	set_int_argument(n, THIRD, SYS_write);
-
 
 	return filewrite(f, p, n);
 }
@@ -213,8 +211,10 @@ sys_close(void)
 	struct file *f;
 
 	if(argfd(0, &fd, &f) < 0)
-		return -1;
+	        return -1;
 	myproc()->ofile[fd] = 0;
+
+	set_pointer_argument((uint)f, FIRST, SYS_close);
 	fileclose(f);
 	return 0;
 }
@@ -227,6 +227,9 @@ sys_fstat(void)
 
 	if(argfd(0, 0, &f) < 0 || argptr(1, (void*)&st, sizeof(*st)) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_fstat);
+	set_pointer_argument((uint)st, SECOND, SYS_fstat);
 	return filestat(f, st);
 }
 
@@ -239,6 +242,9 @@ sys_link(void)
 
 	if(argstr(0, &old) < 0 || argstr(1, &new) < 0)
 		return -1;
+
+	set_charp_argument(old, FIRST, SYS_link);
+	set_charp_argument(new, SECOND, SYS_link);
 
 	begin_op();
 	if((ip = namei(old)) == 0){
@@ -307,6 +313,8 @@ sys_unlink(void)
 
 	if(argstr(0, &path) < 0)
 		return -1;
+
+	set_charp_argument(path, FIRST, SYS_unlink);
 
 	begin_op();
 	if((dp = nameiparent(path, name)) == 0){
@@ -547,8 +555,7 @@ sys_exec(void)
 	}
 
 	set_charp_argument(path, FIRST, SYS_exec);
-	set_pp_argument((uint)argv, SECOND, SYS_exec);
-	// @TODO add char**
+	set_pointer_argument((uint)argv, SECOND, SYS_exec);
 	return exec(path, argv);
 }
 
@@ -561,6 +568,9 @@ sys_pipe(void)
 
 	if(argptr(0, (void*)&fd, 2*sizeof(fd[0])) < 0)
 		return -1;
+
+	set_pointer_argument((uint)fd, FIRST, SYS_pipe);
+
 	if(pipealloc(&rf, &wf) < 0)
 		return -1;
 	fd0 = -1;

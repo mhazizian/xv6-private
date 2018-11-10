@@ -21,6 +21,7 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+
 char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
         "empty",
         "fork",
@@ -60,16 +61,16 @@ print_arguments(struct system_call_status* system_call)
 	arg = system_call->arguments[j];
 	switch (arg.type) {
 	    case VOID:
-		    return;
+		return;
 	    case INT:
-		    cprintf("    |__ int: %d\n", arg.int_value);
-		    break;
+		cprintf("    |__ int: %d\n", arg.int_value);
+		break;
 	    case CHARP:
-		    cprintf("    |__ char*: %s\n", arg.charp_value);
-		    break;
+		cprintf("    |__ char*: %s\n", arg.charp_value);
+		break;
 	    case POINTER:
-		    cprintf("    |__ *: %p\n", arg.pp_value);
-		    break;
+		cprintf("    |__ *: %p\n", arg.p_value);
+		break;
 	    default:
 		    break;
 	}
@@ -623,7 +624,7 @@ invoked_syscalls(int pid)
 		    if (last_system_call != EMPTY)
 			cprintf("\nNumber of Calls: %d\n"
 			        "*********************\n", number_of_calls);
-
+		    number_of_calls = ZERO;
 		    last_system_call = process_system_calls[pid].
 		            system_calls[i].syscall_number;
 		}
@@ -642,7 +643,7 @@ invoked_syscalls(int pid)
 
     cprintf("Process not found!\n");
     release(&ptable.lock);
-    return SUCCESSFUL;
+    return 0;
 }
 
 int
@@ -662,8 +663,15 @@ log_syscalls(void)
 int
 sort_syscalls(int pid)
 {
-    // It is already done!
-    return 0;
+    struct proc* process;
+
+    for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
+	if(process->pid == pid)
+	// It is already done when the program called the new system call
+	    return 0;
+
+    cprintf("Process not found!\n");
+    return 1;
 }
 
 int
