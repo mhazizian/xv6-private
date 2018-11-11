@@ -607,7 +607,7 @@ invoked_syscalls(int pid)
 {
     struct proc* process;
     int i;
-    int last_system_call = EMPTY;
+    int last_system_call_id = EMPTY;
     int number_of_calls = ZERO;
 
     acquire(&ptable.lock);
@@ -618,21 +618,21 @@ invoked_syscalls(int pid)
 		{
 		    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
 		    {
-				if (last_system_call != process_system_calls[pid].
+				if (last_system_call_id != process_system_calls[pid].
 				        system_calls[i].syscall_number)
 				{
-				    if (last_system_call != EMPTY)
+				    if (last_system_call_id != EMPTY)
 						cprintf("\nNumber of Calls: %d\n"
 						        "*********************\n", number_of_calls);
 				    number_of_calls = ZERO;
-				    last_system_call = process_system_calls[pid].
+				    last_system_call_id = process_system_calls[pid].
 				            system_calls[i].syscall_number;
 				}
 				print_system_call_status(&process_system_calls[pid].
 				        system_calls[i]);
 				number_of_calls++;
 		    }
-		    if (last_system_call != EMPTY)
+		    if (last_system_call_id != EMPTY)
 				cprintf("\nNumber of Calls: %d\n"
 				        "*********************\n", number_of_calls);
 
@@ -679,7 +679,7 @@ get_count(int pid, int sysnum)
 {
     struct proc* process;
     int i;
-    int last_system_call = EMPTY;
+    int last_system_call_id = EMPTY;
     int number_of_calls = ZERO;
     acquire(&ptable.lock);
 
@@ -689,10 +689,10 @@ get_count(int pid, int sysnum)
 		{
 		    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
 		    {
-				if (last_system_call != process_system_calls[pid].
+				if (last_system_call_id != process_system_calls[pid].
 				        system_calls[i].syscall_number)
 				{
-				    if (last_system_call == sysnum)
+				    if (last_system_call_id == sysnum)
 				    {
 						cprintf("\nPID: %d, System Call Name: %s, "
 						        "Number of Calls: %d\n"
@@ -702,13 +702,13 @@ get_count(int pid, int sysnum)
 						return 0;
 				    }
 				    number_of_calls = ZERO;
-				    last_system_call = process_system_calls[pid].
+				    last_system_call_id = process_system_calls[pid].
 				            system_calls[i].syscall_number;
 				}
 
 				number_of_calls++;
 		    }
-		    if (last_system_call == sysnum)
+		    if (last_system_call_id == sysnum)
 		    {
 				cprintf("\nPID: %d, System Call Name: %s, "
 				        "Number of Calls: %d\n"
