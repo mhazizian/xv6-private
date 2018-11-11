@@ -184,6 +184,7 @@ UPROGS=\
 	_sort_syscalls\
 	_log_syscalls\
 	_invoked_sys\
+	_get_count\
 	_zombie\
 
 fs.img: mkfs README $(UPROGS)
@@ -255,8 +256,8 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c BubbleSort.c log_syscalls.c invoked_sys.c\
-	sort_syscalls.c README dot-bochsrc *.pl toc.* runoff runoff1\
-	runoff.list\ .gdbinit.tmpl gdbutil\
+	sort_syscalls.c get_count.c README dot-bochsrc *.pl toc.*\
+	runoff runoff1 runoff.list .gdbinit.tmpl gdbutil\
 
 dist:
 	rm -rf dist

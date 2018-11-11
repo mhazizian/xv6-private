@@ -170,7 +170,7 @@ sys_get_count(void)
     int pid;
     int sysnum;
 
-    if((argint(0, &pid) < 0) || (argint(0, &sysnum) < 0))
+    if((argint(0, &pid) < 0) || (argint(1, &sysnum) < 0))
 	    return -1;
 
     set_int_argument(pid, FIRST, SYS_get_count);
