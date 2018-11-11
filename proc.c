@@ -685,41 +685,41 @@ get_count(int pid, int sysnum)
 
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
     {
-	if(process->pid == pid)
-	{
-	    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
-	    {
-		if (last_system_call != process_system_calls[pid].
-		        system_calls[i].syscall_number)
+		if(process->pid == pid)
 		{
+		    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
+		    {
+				if (last_system_call != process_system_calls[pid].
+				        system_calls[i].syscall_number)
+				{
+				    if (last_system_call == sysnum)
+				    {
+						cprintf("\nPID: %d, System Call Name: %s, "
+						        "Number of Calls: %d\n"
+						        "*********************\n", pid,
+						        system_call_name[sysnum], number_of_calls);
+						release(&ptable.lock);
+						return 0;
+				    }
+				    number_of_calls = ZERO;
+				    last_system_call = process_system_calls[pid].
+				            system_calls[i].syscall_number;
+				}
+
+				number_of_calls++;
+		    }
 		    if (last_system_call == sysnum)
 		    {
-			cprintf("\nPID: %d, System Call Name: %s, "
-			        "Number of Calls: %d\n"
-			        "*********************\n", pid,
-			        system_call_name[sysnum], number_of_calls);
-			release(&ptable.lock);
-			return 0;
+				cprintf("\nPID: %d, System Call Name: %s, "
+				        "Number of Calls: %d\n"
+				        "*********************\n", pid,
+				        system_call_name[sysnum], number_of_calls);
+				release(&ptable.lock);
+				return 0;
 		    }
-		    number_of_calls = ZERO;
-		    last_system_call = process_system_calls[pid].
-		            system_calls[i].syscall_number;
+
+		    return 0;
 		}
-
-		number_of_calls++;
-	    }
-	    if (last_system_call == sysnum)
-	    {
-		cprintf("\nPID: %d, System Call Name: %s, "
-		        "Number of Calls: %d\n"
-		        "*********************\n", pid,
-		        system_call_name[sysnum], number_of_calls);
-		release(&ptable.lock);
-		return 0;
-	    }
-
-	    return 0;
-	}
     }
 
     cprintf("Process not found!\n");
