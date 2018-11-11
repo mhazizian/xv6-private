@@ -108,7 +108,7 @@ extern int sys_sort_syscalls(void);
 extern int sys_get_count(void);
 extern int sys_inc_num(void);
 
-extern void reorder_sorted_syscall_by_syscall_num(int, int);
+extern void initialize_new_syscall_status(int, int);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]		sys_fork,
@@ -154,17 +154,14 @@ syscall(void)
 	number_of_calls_in_process =  process_system_calls[curproc->pid].
 	        number_of_calls;
 
+//	cprintf("PID: %d, System call number: %d\n", curproc->pid, num);
+
 	sys_call_time = &process_system_calls[curproc->pid].
 	        system_calls[number_of_calls_in_process].time;
 	cmostime(sys_call_time);
 
+	initialize_new_syscall_status(curproc->pid, num);
 	curproc->tf->eax = syscalls[num]();
-	reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
-//	cprintf("PID: %d, sysytemcall number: %d, number of sysytemcalls: %d, index in sorted by time: %d\n",
-//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].pid,
-//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].syscall_number,
-//	        process_system_calls[curproc->pid].number_of_calls,
-//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].index_in_sorted_syscalls_by_time);
     }
     else {
 	cprintf("%d %s: unknown sys call %d\n",

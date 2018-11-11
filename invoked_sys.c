@@ -12,7 +12,10 @@ main(int argc, char* argv[])
 		exit();
 	}
 
-	sleep(3);
+	invoked_syscalls(atoi(argv[1]));
+	printf(1, "\n############ END OF UNSORTED SYSCALLS #############\n");
+	sort_syscalls(atoi(argv[1]));
+	printf(1, "\n############ END OF SORT SYSCALLS #############\n");
 	invoked_syscalls(atoi(argv[1]));
 	exit();
 }

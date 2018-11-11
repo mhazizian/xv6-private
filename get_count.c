@@ -6,7 +6,6 @@
 int
 main(int argc, char* argv[])
 {
-	sleep(3);
-	get_count(getpid(), 13);
+	get_count(atoi(argv[1]), atoi(argv[2]));
 	exit();
 }
