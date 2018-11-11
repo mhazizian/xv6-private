@@ -24,9 +24,9 @@ extern void set_int_argument(int value, int argument_number,
 void
 swap_syscalls(struct system_call_status* s1, struct system_call_status* s2)
 {
-	struct system_call_status* s3	= s1;
+        struct system_call_status s3 = *s1;
 	*s1 = *s2;
-	*s2 = *s3;
+	*s2 = s3;
 }
 
 void
@@ -48,7 +48,7 @@ config_new_syscall_status(struct system_call_status* new_element,
 void
 reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
 {
-//    int i, j;
+    int i, j;
 	
     struct system_call_status* system_call_status_struct =
             process_system_calls[pid].system_calls;
@@ -58,25 +58,25 @@ reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
             &system_call_status_struct[number_of_calls];
     config_new_syscall_status(last_element, syscall_id, pid);
 
-//    for(i = ONE; i <= number_of_calls; i++)
-//    {
-//	if (system_call_status_struct[i].syscall_number >
-//	        last_element->syscall_number)
-//	    break;
-//    }
+    for(i = ONE; i <= number_of_calls; i++)
+    {
+	if (system_call_status_struct[i].syscall_number >
+	        last_element->syscall_number)
+	    break;
+    }
 
-//    for(j = number_of_calls; j > i; j--)
-//    {
-//	swap_syscalls(&system_call_status_struct[j],
-//	        &system_call_status_struct[j - 1]);
-//	// Correct index
-//	sorted_syscalls.items[system_call_status_struct[j].
-//	        index_in_sorted_syscalls_by_time] =
-//	        &system_call_status_struct[j];
-//	sorted_syscalls.items[system_call_status_struct[j - 1].
-//	        index_in_sorted_syscalls_by_time] =
-//	        &system_call_status_struct[j - 1];
-//    }
+    for(j = number_of_calls; j > i; j--)
+    {
+	swap_syscalls(&system_call_status_struct[j],
+	        &system_call_status_struct[j - 1]);
+	// Correct index
+	sorted_syscalls.items[system_call_status_struct[j].
+	        index_in_sorted_syscalls_by_time] =
+	        &system_call_status_struct[j];
+	sorted_syscalls.items[system_call_status_struct[j - 1].
+	        index_in_sorted_syscalls_by_time] =
+	        &system_call_status_struct[j - 1];
+    }
 }
 
 void
