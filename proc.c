@@ -668,6 +668,11 @@ sort_syscalls(int pid)
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
 	if(process->pid == pid)
 	// It is already done when the program called the new system call
+		for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
+	    {
+	    	print_system_call_status(&process_system_calls[pid].
+			        system_calls[i]);
+	    }
 	    return 0;
 
     cprintf("Process not found!\n");
