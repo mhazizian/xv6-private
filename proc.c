@@ -13,6 +13,14 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
+void
+swap_syscalls(struct system_call_status* s1, struct system_call_status* s2)
+{
+        struct system_call_status s3 = *s1;
+	*s1 = *s2;
+	*s2 = s3;
+}
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -667,18 +675,47 @@ log_syscalls(void)
 int
 sort_syscalls(int pid)
 {
-    int i;
+    int i, j, k;
     struct proc* process;
+    struct system_call_status* system_call_status_struct;
 
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
-	if(process->pid == pid)
-	// It is already done when the program called the new system call
-		for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
-	    {
-	    	print_system_call_status(&process_system_calls[pid].
-			        system_calls[i]);
-	    }
-	    return 0;
+		if(process->pid == pid)
+		{
+			// sort:
+			system_call_status_struct = process_system_calls[pid].system_calls;
+			for (j = ONE; j <= process_system_calls[pid].number_of_calls; j++)
+			{
+			    for(i = ONE; i <= j; i++)
+			    {
+					if (system_call_status_struct[i].syscall_number >
+					        system_call_status_struct[j].syscall_number)
+					    break;
+			    }
+
+			    for(k = j; k > i; k--)
+			    {
+					swap_syscalls(&system_call_status_struct[k],
+					        &system_call_status_struct[k - 1]);
+					
+					// Correct index
+					sorted_syscalls.items[system_call_status_struct[k].
+					        index_in_sorted_syscalls_by_time] =
+					        &system_call_status_struct[k];
+					sorted_syscalls.items[system_call_status_struct[k - 1].
+					        index_in_sorted_syscalls_by_time] =
+					        &system_call_status_struct[k - 1];
+			    }
+			}	
+
+			// print sorted system calls:
+			for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
+		    {
+		    	print_system_call_status(&process_system_calls[pid].
+				        system_calls[i]);
+		    }
+		    return 0;
+		}
 
     cprintf("Process not found!\n");
     return 1;
