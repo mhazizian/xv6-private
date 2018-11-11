@@ -139,8 +139,6 @@ static int (*syscalls[])(void) = {
 [SYS_inc_num]       sys_inc_num,
 };
 
-int temp = 0;
-
 void
 syscall(void)
 {
@@ -149,30 +147,24 @@ syscall(void)
     struct rtcdate* sys_call_time;
     int number_of_calls_in_process;
     num = curproc->tf->eax;
-    int i;
-
-    if (curproc->pid != temp)
-    {
-        cprintf("$$$$$$$$$$$$$$$$$$$$$$$\n");
-        for (i = 0; i < 64; ++i) {
-            cprintf("               number of calls: %d\n", process_system_calls[i].number_of_calls);
-        }
-        temp = curproc->pid;
-    }
 
     if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-	system_calls[num]++;
+	process_system_calls[curproc->pid].number_of_calls %= MAX_SYS_CALL_NUMBERS - 1;
 	process_system_calls[curproc->pid].number_of_calls++;
-//        cprintf("              num is:%d   %d   %d\n",curproc->pid, num, process_system_calls[curproc->pid].number_of_calls);
-        number_of_calls_in_process =  process_system_calls[curproc->pid].
+	number_of_calls_in_process =  process_system_calls[curproc->pid].
 	        number_of_calls;
 
 	sys_call_time = &process_system_calls[curproc->pid].
 	        system_calls[number_of_calls_in_process].time;
 	cmostime(sys_call_time);
 
-	reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
 	curproc->tf->eax = syscalls[num]();
+	reorder_sorted_syscall_by_syscall_num(curproc->pid, num);
+//	cprintf("PID: %d, sysytemcall number: %d, number of sysytemcalls: %d, index in sorted by time: %d\n",
+//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].pid,
+//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].syscall_number,
+//	        process_system_calls[curproc->pid].number_of_calls,
+//	        process_system_calls[curproc->pid].system_calls[number_of_calls_in_process].index_in_sorted_syscalls_by_time);
     }
     else {
 	cprintf("%d %s: unknown sys call %d\n",

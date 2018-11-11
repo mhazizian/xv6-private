@@ -654,7 +654,8 @@ log_syscalls(void)
 {
     int i;
     for(i = FIRST; i < sorted_syscalls.number_of_calls; i++)
-	cprintf("System Call Name: %s - Call Time: %d:%d:%d - PID: %d\n",
+	cprintf("############## number of calls: %d, i: %d, System Call Name: %s - Call Time: %d:%d:%d - PID: %d\n",
+	        sorted_syscalls.number_of_calls, i,
 	        system_call_name[sorted_syscalls.items[i]->syscall_number],
 	        sorted_syscalls.items[i]->time.hour,
 	        sorted_syscalls.items[i]->time.minute,

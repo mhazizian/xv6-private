@@ -65,8 +65,6 @@ struct array_of_syscall_pointer {
     struct system_call_status* items[NPROC * MAX_SYS_CALL_NUMBERS];
 } sorted_syscalls;
 
-// The 1-based array has been used to be compatible with system call number
-int system_calls[SYS_CALL_NUMBERS];
 struct system_call process_system_calls[NPROC];
 
 struct cpu {
