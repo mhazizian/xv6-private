@@ -614,31 +614,31 @@ invoked_syscalls(int pid)
 
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)
     {
-	if(process->pid == pid)
-	{
-	    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
-	    {
-		if (last_system_call != process_system_calls[pid].
-		        system_calls[i].syscall_number)
+		if(process->pid == pid)
 		{
+		    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
+		    {
+				if (last_system_call != process_system_calls[pid].
+				        system_calls[i].syscall_number)
+				{
+				    if (last_system_call != EMPTY)
+						cprintf("\nNumber of Calls: %d\n"
+						        "*********************\n", number_of_calls);
+				    number_of_calls = ZERO;
+				    last_system_call = process_system_calls[pid].
+				            system_calls[i].syscall_number;
+				}
+				print_system_call_status(&process_system_calls[pid].
+				        system_calls[i]);
+				number_of_calls++;
+		    }
 		    if (last_system_call != EMPTY)
-			cprintf("\nNumber of Calls: %d\n"
-			        "*********************\n", number_of_calls);
-		    number_of_calls = ZERO;
-		    last_system_call = process_system_calls[pid].
-		            system_calls[i].syscall_number;
-		}
-		print_system_call_status(&process_system_calls[pid].
-		        system_calls[i]);
-		number_of_calls++;
-	    }
-	    if (last_system_call != EMPTY)
-		cprintf("\nNumber of Calls: %d\n"
-		        "*********************\n", number_of_calls);
+				cprintf("\nNumber of Calls: %d\n"
+				        "*********************\n", number_of_calls);
 
-	    release(&ptable.lock);
-	    return 0;
-	}
+		    release(&ptable.lock);
+		    return 0;
+		}
     }
 
     cprintf("Process not found!\n");
