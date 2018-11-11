@@ -617,6 +617,8 @@ invoked_syscalls(int pid)
     {
 		if(process->pid == pid)
 		{
+
+            cprintf("                 PID: %d, Number of syscalls: %d\n", pid, process_system_calls[pid].number_of_calls);
 		    for(i = ONE; i <= process_system_calls[pid].number_of_calls; i++)
 		    {
 				if (last_system_call_id != process_system_calls[pid].
@@ -664,6 +666,7 @@ log_syscalls(void)
 int
 sort_syscalls(int pid)
 {
+    int i;
     struct proc* process;
 
     for(process = ptable.proc; process < &ptable.proc[NPROC]; process++)

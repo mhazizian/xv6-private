@@ -57,7 +57,7 @@ reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
             &system_call_status_struct[number_of_calls];
     config_new_syscall_status(last_element, syscall_id, pid);
 
-    for(i = SECOND; i <= number_of_calls; i++)
+    for(i = ONE; i <= number_of_calls; i++)
     {
 	if (system_call_status_struct[i].syscall_number >
 	        last_element->syscall_number)
@@ -66,15 +66,15 @@ reorder_sorted_syscall_by_syscall_num(int pid, int syscall_id)
 
     for(j = number_of_calls; j > i; j--)
     {
-	swap_syscalls(&system_call_status_struct[j],
-	        &system_call_status_struct[j - 1]);
-	// Correct index
-	sorted_syscalls.items[system_call_status_struct[j].
-	        index_in_sorted_syscalls_by_time] =
-	        &system_call_status_struct[j];
-	sorted_syscalls.items[system_call_status_struct[j - 1].
-	        index_in_sorted_syscalls_by_time] =
-	        &system_call_status_struct[j - 1];
+        swap_syscalls(&system_call_status_struct[j],
+                &system_call_status_struct[j - 1]);
+        // Correct index
+        sorted_syscalls.items[system_call_status_struct[j].
+                index_in_sorted_syscalls_by_time] =
+                &system_call_status_struct[j];
+        sorted_syscalls.items[system_call_status_struct[j - 1].
+                index_in_sorted_syscalls_by_time] =
+                &system_call_status_struct[j - 1];
     }
 }
 

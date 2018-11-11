@@ -139,6 +139,8 @@ static int (*syscalls[])(void) = {
 [SYS_inc_num]       sys_inc_num,
 };
 
+int temp = 0;
+
 void
 syscall(void)
 {
@@ -147,11 +149,22 @@ syscall(void)
     struct rtcdate* sys_call_time;
     int number_of_calls_in_process;
     num = curproc->tf->eax;
+    int i;
+
+    if (curproc->pid != temp)
+    {
+        cprintf("$$$$$$$$$$$$$$$$$$$$$$$\n");
+        for (i = 0; i < 64; ++i) {
+            cprintf("               number of calls: %d\n", process_system_calls[i].number_of_calls);
+        }
+        temp = curproc->pid;
+    }
 
     if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
 	system_calls[num]++;
 	process_system_calls[curproc->pid].number_of_calls++;
-	number_of_calls_in_process =  process_system_calls[curproc->pid].
+//        cprintf("              num is:%d   %d   %d\n",curproc->pid, num, process_system_calls[curproc->pid].number_of_calls);
+        number_of_calls_in_process =  process_system_calls[curproc->pid].
 	        number_of_calls;
 
 	sys_call_time = &process_system_calls[curproc->pid].

@@ -11,6 +11,7 @@ main(int argc, char* argv[])
 		printf(2, "Please enter your requested PID ...\n");
 		exit();
 	}
+
 	sleep(3);
 	invoked_syscalls(atoi(argv[1]));
 	exit();
