@@ -1,5 +1,6 @@
 struct stat;
 struct rtcdate;
+struct ticketlock;
 
 // system calls
 int fork(void);
@@ -23,6 +24,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+void ticketlockinit(struct ticketlock*);
+void ticketlocktest(struct ticketlock*);
 
 // ulib.c
 int stat(const char*, struct stat*);

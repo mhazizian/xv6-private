@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "ticketlock.h"
 
 struct {
 	struct spinlock lock;
@@ -531,4 +532,16 @@ procdump(void)
 		}
 		cprintf("\n");
 	}
+}
+
+void
+ticketlockinit(struct ticketlock* lk)
+{
+
+}
+
+void
+ticketlocktest(struct ticketlock* lk)
+{
+
 }
