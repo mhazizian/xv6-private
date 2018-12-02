@@ -121,6 +121,8 @@ void						userinit(void);
 int						 wait(void);
 void						wakeup(void*);
 void						yield(void);
+void						ticketlockinit(struct ticketlock*);
+void						ticketlocktest(struct ticketlock*);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
@@ -141,8 +143,9 @@ int						 holdingsleep(struct sleeplock*);
 void						initsleeplock(struct sleeplock*, char*);
 
 // ticketlock.c
-void						ticketlockinit(struct ticketlock*);
-void						ticketlocktest(struct ticketlock*);
+void						initticketlock(struct ticketlock *ticket);
+void						acquireticket(struct ticketlock *lk);
+void						releaseticket(struct ticketlock *lk);
 
 // string.c
 int						 memcmp(const void*, const void*, uint);

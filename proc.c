@@ -537,7 +537,7 @@ procdump(void)
 void
 ticketlockinit(struct ticketlock* lk)
 {
-
+	initticketlock(lk);
 }
 
 void

@@ -16,4 +16,7 @@ struct ticketlock {
 	int pid;					 // Process holding lock
 	int next_ticket;
 	int now_serving_ticket;
+
+	// For debugging:
+//	int init;
 };

@@ -2,6 +2,7 @@
 #include "stat.h"
 #include "fcntl.h"
 #include "user.h"
+#include "ticketlock.h"
 
 #define NUMBER_OF_ELEMENTS 5
 
@@ -46,10 +47,12 @@ void write_array(char* numbers[])
 
 int main(int argc, char *argv[])
 {
+	struct ticketlock lk;
 	if (argc == (NUMBER_OF_ELEMENTS + 1))
 	{
 		bubble_sort(&argv[1]);
 		write_array(&argv[1]);
+		ticketlockinit(&lk);
 		exit();
 	}
 	else
