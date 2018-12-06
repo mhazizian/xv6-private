@@ -130,14 +130,24 @@ xchg(volatile uint *addr, uint newval)
 	return result;
 }
 
-static inline int fetch_and_add(int* variable, int value)
+// static inline int fetch_and_add(int* variable, int value)
+// {
+// 	__asm__ volatile("lock; xaddl %0, %1"
+// 	: "+r" (value), "+m" (*variable) // input+output
+// 	: // No input-only
+// 	: "memory"
+// 	);
+// 	return value;
+// }
+inline unsigned int fetch_and_add(volatile unsigned int* p, unsigned int incr)
 {
-	__asm__ volatile("lock; xaddl %0, %1"
-	: "+r" (value), "+m" (*variable) // input+output
-	: // No input-only
-	: "memory"
-	);
-	return value;
+
+    unsigned int result;
+    __asm__ volatile ("lock; xadd %0, %1" :
+            "=r"(result), "=m"(*p):
+            "0"(incr), "m"(*p) :
+            "memory");
+    return result;
 }
 
 static inline uint

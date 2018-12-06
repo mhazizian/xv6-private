@@ -1,4 +1,4 @@
-// Mutual exclusion lock.
+// // Mutual exclusion lock.
 // struct myspinlock {
 // 	uint locked;			 // Is the lock held?
 
@@ -13,9 +13,9 @@
 struct ticketlock {
 	uint locked;			 // Is the lock held?
 	// struct myspinlock lk; // spinlock protecting this ticket lock
-	int pid;					 // Process holding lock
-	int next_ticket;
-	int now_serving_ticket;
+	unsigned int pid;					 // Process holding lock
+	unsigned int next_ticket;
+	unsigned int now_serving_ticket;
 
 	// For debugging:
 //	int init;
