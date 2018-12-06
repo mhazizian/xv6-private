@@ -1,63 +1,35 @@
 #include "types.h"
-#include "stat.h"
-#include "fcntl.h"
 #include "user.h"
 #include "ticketlock.h"
 
-#define NUMBER_OF_ELEMENTS 5
-
-void swap(char** first_element, char** second_element)
-{
-	char* temp = *first_element;
-	*first_element = *second_element;
-	*second_element = temp;
-}
- 
-void bubble_sort(char* numbers[])
-{
-	int i, j;
-	for (i = 0; i < NUMBER_OF_ELEMENTS - 1; i++)
-		for (j = 0; j < NUMBER_OF_ELEMENTS - i - 1; j++)
-			if (atoi(numbers[j]) > atoi(numbers[j + 1]))
-				swap(&numbers[j], &numbers[j + 1]);
-}
- 
-void write_array(char* numbers[])
-{
-	int i = 0;
-	int file_descriptor = open("result.txt", O_CREATE | O_WRONLY);
-	
-	printf(1, "Process ID : %d\n", getpid());
-	
-	if (file_descriptor < 0)
-	{
-		printf(2, "Something went wrong!\nThe program can't open the result.txt file!\n");	
-		return;
-	}
-
-	for (i = 0; i < NUMBER_OF_ELEMENTS; i++)
-	{
-		write(file_descriptor, numbers[i], sizeof(numbers[i]) / sizeof(char));
-		write(file_descriptor, " ", sizeof(char));
-	}
-
-	write(file_descriptor, "\n", sizeof(char));
-	close(file_descriptor);
-}
+#define NCHILD 10
 
 int main(int argc, char *argv[])
 {
-	struct ticketlock lk;
-	if (argc == (NUMBER_OF_ELEMENTS + 1))
+	int pid, i;
+	struct ticketlock lock;
+	ticketlockinit(&lock);
+
+	pid = fork();
+	for (i = 0; i < NCHILD; ++i)
+		if (pid > 0)
+			pid = fork();
+
+	if (pid < 0)
 	{
-		bubble_sort(&argv[1]);
-		write_array(&argv[1]);
-		ticketlockinit(&lk);
-		exit();
+		printf(2, "fork error\n");
+	}
+	else if (pid == 0)
+	{
+//		printf(1, "child adding to shared counter\n");
+		ticketlocktest(&lock);
 	}
 	else
 	{
-		printf(2, "Invalid input!!!\n");
-		exit();
+		for (int i = 0; i < NCHILD; ++i)
+			wait();
+//		printf(1, "user program finished\n");
 	}
+
+	exit();
 }
