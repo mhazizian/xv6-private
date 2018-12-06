@@ -20,23 +20,30 @@ initticketlock(struct ticketlock *ticket)
 	ticket->now_serving_ticket = 0;
 }
 
+//unsigned int temp = 0;
+
 void
 acquireticket(struct ticketlock *lk)
 {
-	int my_ticket;
-	int val = 1;
+
+//	int my_ticket;
+//	int val = 1;
 	// acquire((struct spinlock*)&lk->lk);
 	
-	
-	my_ticket = fetch_and_add(&lk->next_ticket, val);
-	my_ticket = fetch_and_add(&lk->next_ticket, val);
+//	cprintf("before adding temp: %d\n", temp);
+//	fetch_and_add(&temp, 1);
+//	cprintf("after adding temp: %d\n", temp);
 
-	cprintf("goint to acquire: lk->next_ticket: %d, myticket: %d, lk_add: %p\n", lk->next_ticket, my_ticket, lk);
+	int my_ticket = fetch_and_add(&lk->next_ticket, 1);
+//	my_ticket = fetch_and_add(&lk->next_ticket, val);
+//	int my_ticket = (lk->next_ticket)++;
+//	my_ticket = (lk->next_ticket)++;
 
-	// int my_ticket = ++(lk->next_ticket);
+//	cprintf("lk->next_ticket: %d\n", lk->next_ticket);
+
 
 	while(lk->now_serving_ticket != my_ticket);
-	cprintf("acquire: lk->next_ticket:%d\n", lk->next_ticket);
+//	cprintf("acquire: lk->next_ticket:%d\n", lk->next_ticket);
 
 	// cprintf("acquire: next_ticket:%d\n", lk->next_ticket);
 	
@@ -54,10 +61,12 @@ releaseticket(struct ticketlock *lk)
 	// acquire((struct spinlock*)&lk->lk);
 	if (lk->pid == myproc()->pid)
 	{
-		cprintf("release: my_ticket:%d\n", lk->now_serving_ticket);
+//		cprintf("release: my_ticket:%d\n", lk->now_serving_ticket);
 		lk->locked = 0;
 		lk->pid = 0;
-		lk->now_serving_ticket++;
+		fetch_and_add(&lk->now_serving_ticket, 1);
+//		cprintf("release: now_serving:%d\n", lk->now_serving_ticket);
+//		lk->now_serving_ticket++;
 //		wakeup(lk);
 	}
 	// release((struct spinlock*)&lk->lk);

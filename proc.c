@@ -534,8 +534,10 @@ procdump(void)
 	}
 }
 
+struct ticketlock* lk;
+
 void
-ticketlockinit(struct ticketlock* lk)
+ticketlockinit()
 {
 	initticketlock(lk);
 }
@@ -543,11 +545,11 @@ ticketlockinit(struct ticketlock* lk)
 int global_variable = 0;
 
 void
-ticketlocktest(struct ticketlock* lk)
+ticketlocktest()
 {
 	acquireticket(lk);
-	// cprintf("current value: %d ", global_variable);
+	 cprintf("current value: %d ", global_variable);
 	global_variable++;
-	// cprintf("new value: %d\n", global_variable);
+	 cprintf("new value: %d\n", global_variable);
 	releaseticket(lk);
 }
