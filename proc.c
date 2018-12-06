@@ -548,8 +548,8 @@ void
 ticketlocktest()
 {
 	acquireticket(&lk);
-	// cprintf("current value: %d ", global_variable);
+	 cprintf("current value: %d ", global_variable);
 	global_variable++;
-	// cprintf("new value: %d\n", global_variable);
+	 cprintf("new value: %d\n", global_variable);
 	releaseticket(&lk);
 }
