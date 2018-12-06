@@ -139,7 +139,8 @@ xchg(volatile uint *addr, uint newval)
 // 	);
 // 	return value;
 // }
-inline unsigned int fetch_and_add(volatile unsigned int* p, unsigned int incr)
+static inline unsigned int
+fetch_and_add(volatile unsigned int* p, unsigned int incr)
 {
 
     unsigned int result;

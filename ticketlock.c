@@ -27,15 +27,19 @@ acquireticket(struct ticketlock *lk)
 	int val = 1;
 	// acquire((struct spinlock*)&lk->lk);
 	
-	cprintf("goint to acquire: my_ticket:%d\n", lk->next_ticket);
-
+	
 	my_ticket = fetch_and_add(&lk->next_ticket, val);
+	my_ticket = fetch_and_add(&lk->next_ticket, val);
+
+	cprintf("goint to acquire: lk->next_ticket: %d, myticket: %d, lk_add: %p\n", lk->next_ticket, my_ticket, lk);
 
 	// int my_ticket = ++(lk->next_ticket);
 
 	while(lk->now_serving_ticket != my_ticket);
-	// cprintf("acquire: my_ticket:%d\n", my_ticket);
-	cprintf("acquire: next_ticket:%d\n", lk->next_ticket);
+	cprintf("acquire: lk->next_ticket:%d\n", lk->next_ticket);
+
+	// cprintf("acquire: next_ticket:%d\n", lk->next_ticket);
+	
 //	while (lk->locked) {
 //		sleep(lk, &lk->lk);
 //	}
