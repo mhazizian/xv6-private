@@ -121,8 +121,10 @@ void						userinit(void);
 int						 wait(void);
 void						wakeup(void*);
 void						yield(void);
-void						ticketlockinit();
-void						ticketlocktest();
+void						ticketlockinit(void);
+void						ticketlocktest(void);
+void						rwinit(void);
+void						rwtest(uint pattern);
 
 // swtch.S
 void						swtch(struct context**, struct context*);

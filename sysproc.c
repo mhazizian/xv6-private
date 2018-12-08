@@ -94,10 +94,6 @@ sys_uptime(void)
 int
 sys_ticketlockinit(void)
 {
-//	struct ticketlock *lk;
-
-//	if(argptr(0, (void*)&lk, sizeof(*lk)) < 0)
-//		return -1;
 	ticketlockinit();
 	return 0;
 }
@@ -105,11 +101,18 @@ sys_ticketlockinit(void)
 int
 sys_ticketlocktest(void)
 {
-//	struct ticketlock *lk;
-
-//	if(argptr(0, (void*)&lk, sizeof(*lk)) < 0)
-//		return -1;
 	ticketlocktest();
 	return 0;
 }
 
+int
+sys_rwinit(void)
+{
+	return 0;
+}
+
+int
+sys_rwtest(uint pattern)
+{
+	return 0;
+}

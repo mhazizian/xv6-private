@@ -543,7 +543,6 @@ ticketlockinit()
 	initticketlock(&lk);
 }
 
-
 void
 ticketlocktest()
 {
@@ -552,4 +551,16 @@ ticketlocktest()
 	global_variable++;
 	 cprintf("new value: %d\n", global_variable);
 	releaseticket(&lk);
+}
+
+void
+rwinit()
+{
+
+}
+
+void
+rwtest(uint pattern)
+{
+
 }
