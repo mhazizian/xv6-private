@@ -23,20 +23,19 @@ unsigned int temp = 0;
 void
 acquireticket(struct ticketlock *lk)
 {
-	// int temp;
+	//int temp;
+	//cprintf("going to acuqire, my_ticket: %d\n", my_ticket);
 	int my_ticket = fetch_and_add(&lk->next_ticket, 1);
-//	cprintf("going to acuqire, my_ticket: %d\n", my_ticket);
 
-	while(lk->now_serving_ticket != my_ticket)
-//		 temp = temp * lk->next_ticket - lk->pid;
-		cprintf("____now serving: %d vs. my ticket: %d\n", lk->now_serving_ticket, my_ticket);
 
+// 	while(lk->now_serving_ticket != my_ticket)
+// //		 temp = temp * lk->next_ticket - lk->pid;
+// 		cprintf("____now serving: %d vs. my ticket: %d\n", lk->now_serving_ticket, my_ticket);
+
+	while (lk->now_serving_ticket < my_ticket) {
+		sleep(lk, '\0');
+	}
 //	cprintf("acquire: ticket: %d, next_ticket: %d, pointer: %p\n", my_ticket, lk->next_ticket, &(*lk));
-	
-//	while (lk->locked) {
-//		sleep(lk, &lk->lk);
-//	}
-
 	lk->pid = myproc()->pid;
 
 }
@@ -52,7 +51,7 @@ releaseticket(struct ticketlock *lk)
 		// fetch_and_add(&lk->now_serving_ticket, 1);
 		lk->now_serving_ticket++;
 //		cprintf("release done: now serving is: %d\n", lk->now_serving_ticket);
-//		wakeup(lk);
+		wakeup(lk);
 	}
 	else
 		cprintf("Failed to release the lock!\n");
