@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		for (int i = 0; i < NCHILD; ++i)
+		for (int i = 0; i < NCHILD + 1; ++i)
 			wait();
 //		printf(1, "user program finished\n");
 	}
