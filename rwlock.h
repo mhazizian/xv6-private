@@ -3,8 +3,10 @@
 struct rwlock {
 	// It's been initialized like semaphores
 	// - allow only one writer to enter critical section.
-	// - forbid readers to enter critical section when a writer is writing.
 	unsigned int resource;		
+
+	// forbid readers to enter critical section when a writer is writing.
+	unsigned int write_lock;
 
 	// for allowing multi reader to enter critical section
 	unsigned int read_count;
