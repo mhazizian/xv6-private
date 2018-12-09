@@ -26,8 +26,10 @@ acquire_writer(struct rwlock *lock)
 {
 	cprintf("** W: AC: Going_AC, pid=%d\n", myproc()->pid);
 
-	while ((xchg(&lock->resource, 0) != 1) || (xchg(&lock->function_lock, 1) != 0))
+	while ((xchg(&lock->resource, 0) != 1) || (xchg(&lock->function_lock, 1) != 0)) {
 		sleep(lock, '\0');
+		cprintf("@@@@ W: AC: Retry Going_AC, pid=%d\n", myproc()->pid);
+	}
 
 
 	lock->pid = myproc()->pid;
@@ -41,11 +43,13 @@ acquire_writer(struct rwlock *lock)
 void
 release_writer(struct rwlock *lock)
 {
-	cprintf("** W: RE: Going to Release, pid=%d\n", myproc()->pid);
+	cprintf("** W: RE: Going to Release, pid=%d.\n", myproc()->pid);
 
-	while(xchg(&lock->function_lock, 1) != 0)
+	while(xchg(&(lock->function_lock), 1) != 0) {
 		sleep(lock, '\0');
-
+		cprintf("@@@@ W: RE: Retry: Going to Release, pid=%d\n", myproc()->pid);
+	}
+		
 
 	lock->pid = 0;
 
@@ -62,8 +66,10 @@ acquire_reader(struct rwlock *lock)
 {
 	cprintf("__ R: AC: Going to AC, pid=%d\n", myproc()->pid);
 
-	while(xchg(&lock->function_lock, 1) != 0 || (lock->write_lock))
+	while(xchg(&lock->function_lock, 1) != 0 || (lock->write_lock)) {
 		sleep(lock, '\0');
+		cprintf("@@@@ R: AC: Retry: Going to AC, pid=%d\n", myproc()->pid);
+	}
 
 
 	lock->read_count++;
@@ -79,10 +85,12 @@ acquire_reader(struct rwlock *lock)
 void
 release_reader(struct rwlock *lock)
 {
-	cprintf("__ R: RE: Going to Release, pid=%d\n", myproc()->pid);
+	cprintf("__ R: RE: Going to Release, pid=%d, reader_count=%d\n", myproc()->pid, lock->read_count);
 
-	while(xchg(&lock->function_lock, 1) != 0)
+	while(xchg(&lock->function_lock, 1) != 0) {
 		sleep(lock, '\0');
+		cprintf("@@@@ R: RE: Retry: Going to Release, pid=%d\n", myproc()->pid);
+	}
 
 
 	if (--lock->read_count == 0)
@@ -91,8 +99,7 @@ release_reader(struct rwlock *lock)
 		lock->pid = myproc()->pid;
 	}
 	
-
-	cprintf("__ R: RE: Released, pid=%d\n", myproc()->pid);
+	cprintf("__ R: RE: Released, pid=%d, reader_count=%d\n", myproc()->pid, lock->read_count);
 	lock->function_lock = 0;
 	wakeup(lock);
 }
