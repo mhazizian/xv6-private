@@ -64,13 +64,15 @@ release_pw_writer(struct rwlock *lock)
 void
 acquire_pw_reader(struct rwlock *lock)
 {
-    while(xchg(&lock->function_lock, 1) != 0 || lock->write_count > 0)
+    cprintf("__R: AC: Going to Enter, pid=%d, writer_in_queue: %d\n", myproc()->pid, lock->write_count);
+    while(xchg(&lock->function_lock, 1) != 0 || (lock->write_count > 0) || (!lock->resource))
 		sleep(lock, '\0');
 
+    cprintf("__R: AC: Entered, pid=%d, writer_in_queue: %d\n", myproc()->pid, lock->write_count);
 	if (++lock->read_count == 1)
 	{
-		while (!lock->resource)
-			sleep(lock, '\0');
+		// while (!lock->resource)
+		// 	sleep(lock, '\0');
 		lock->resource = 0;
 		lock->pid = myproc()->pid;
 	}

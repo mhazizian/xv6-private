@@ -63,7 +63,9 @@ release_writer(struct rwlock *lock)
 void
 acquire_reader(struct rwlock *lock)
 {
-	entry_section(lock);
+	while(xchg(&lock->function_lock, 1) != 0)
+		sleep(lock, '\0');
+
 
 	if (++lock->read_count == 1)
 	{
@@ -83,8 +85,9 @@ release_reader(struct rwlock *lock)
 
 	if (--lock->read_count == 0)
 	{
-		// while (!lock->resource)
-		// 	sleep(lock, '\0');
+		// TODO
+		while (!lock->resource)
+			sleep(lock, '\0');
 		// lock->resource = 0;
 		lock->resource = 1;
 		lock->pid = myproc()->pid;
