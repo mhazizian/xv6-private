@@ -24,74 +24,75 @@ init_rw_lock(struct rwlock *lock)
 void
 acquire_writer(struct rwlock *lock)
 {
-	cprintf("__W: AC: Going to Enter, pid=%d\n", myproc()->pid);
+	cprintf("** W: AC: Going_AC, pid=%d\n", myproc()->pid);
 
 	while ((xchg(&lock->resource, 0) != 1) || (xchg(&lock->function_lock, 1) != 0))
 		sleep(lock, '\0');
 
-	cprintf("__W: AC: Enterd, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
 	lock->pid = myproc()->pid;
 	lock->write_lock = 1;
-	
-	lock->function_lock = 0;
 
-	cprintf("__W: AC: Write Entered.\n");
+	cprintf("** W: AC: AC_Done, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
+	lock->function_lock = 0;
+	wakeup(lock);
 }
 
 void
 release_writer(struct rwlock *lock)
 {
-	cprintf("__W: RE: Going to entry Section, pid=%d\n", myproc()->pid);
+	cprintf("** W: RE: Going to Release, pid=%d\n", myproc()->pid);
+
 	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
 
-	cprintf("__W: RE: Enterd entry Section, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
 	lock->pid = 0;
 
-	
 	lock->resource = 1;
 	lock->write_lock = 0;
 
+	cprintf("** W: RE: Released, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 	lock->function_lock = 0;
 	wakeup(lock);
-	
-	cprintf("__W: RE: Write Released.\n");
 }
 
 void
 acquire_reader(struct rwlock *lock)
 {
-	cprintf("__R: AC: Going to entry Section, pid=%d\n", myproc()->pid);
+	cprintf("__ R: AC: Going to AC, pid=%d\n", myproc()->pid);
 
 	while(xchg(&lock->function_lock, 1) != 0 || (lock->write_lock))
 		sleep(lock, '\0');
 
-	cprintf("__R: AC: Enterd, pid=%d\n", myproc()->pid);
 
 	lock->read_count++;
 	lock->resource = 0;
 	lock->pid = myproc()->pid;
 
+	cprintf("__ R: AC: AC_Done, pid=%d\n", myproc()->pid);
+
 	lock->function_lock = 0;
+	wakeup(lock);
 }
 
 void
 release_reader(struct rwlock *lock)
 {
-	cprintf("__R: RE: Going to entry Section, pid=%d\n", myproc()->pid);
+	cprintf("__ R: RE: Going to Release, pid=%d\n", myproc()->pid);
 
 	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
 
-	cprintf("__R: RE: Enterd, pid=%d\n", myproc()->pid);
 
 	if (--lock->read_count == 0)
 	{
 		lock->resource = 1;
 		lock->pid = myproc()->pid;
 	}
+	
 
+	cprintf("__ R: RE: Released, pid=%d\n", myproc()->pid);
 	lock->function_lock = 0;
+	wakeup(lock);
 }

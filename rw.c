@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 	else if (pid == 0)
 	{
 //		printf(1, "child adding to shared counter\n");
-		rwtest(36); // 100010
+		// rwtest(36); // 100010
+		rwtest(10); // 1010
 	}
 	else
 	{
