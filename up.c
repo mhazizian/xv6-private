@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+
 	int pid, i;
 //	struct ticketlock lock;
 	ticketlockinit();

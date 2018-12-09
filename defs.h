@@ -10,6 +10,7 @@ struct sleeplock;
 struct stat;
 struct superblock;
 struct ticketlock;
+struct rwlock;
 
 // bio.c
 void						binit(void);
@@ -148,6 +149,21 @@ void						initsleeplock(struct sleeplock*, char*);
 void						initticketlock(struct ticketlock *ticket);
 void						acquireticket(struct ticketlock *lk);
 void						releaseticket(struct ticketlock *lk);
+
+// rwlock.c
+
+void
+entry_section(struct rwlock *lock);
+void
+init_rw_lock(struct rwlock *lock);
+void
+acquire_writer(struct rwlock *lock);
+void
+release_writer(struct rwlock *lock);
+void
+acquire_reader(struct rwlock *lock);
+void
+release_reader(struct rwlock *lock);
 
 // string.c
 int						 memcmp(const void*, const void*, uint);

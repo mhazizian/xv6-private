@@ -74,7 +74,6 @@ acquire_reader(struct rwlock *lock)
 	lock->function_lock = 0;
 }
 
-
 void
 release_reader(struct rwlock *lock)
 {

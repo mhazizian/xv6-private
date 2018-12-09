@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "ticketlock.h"
+#include "rwlock.h"
 
 struct {
 	struct spinlock lock;
@@ -16,6 +17,7 @@ struct {
 static struct proc *initproc;
 
 int nextpid = 1;
+
 extern void forkret(void);
 extern void trapret(void);
 
@@ -557,13 +559,42 @@ ticketlocktest()
 }
 
 void
+to_binary(uint pattern, uint binary[])
+{
+	int i = 0;
+	int bit;
+
+	while(pattern && i < 32)
+	{
+		bit = pattern % 2;
+		binary[i++] = bit;
+		pattern /= 2;
+	}
+}
+
+struct rwlock rw_test_lock;
+
+void
 rwinit()
 {
-
+	init_rw_lock(&rw_test_lock);
 }
+
 
 void
 rwtest(uint pattern)
 {
+	int i;
+	uint binary[32];
+	to_binary(pattern, binary);
+	for (i = 31; i >= 0 && binary[i] == 0; i--);
 
+	for (i-- ; i >= 0; i--)
+	{
+		// 0 : Reader
+		if (!binary[i])
+		{
+
+		}
+	}
 }
