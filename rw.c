@@ -1,7 +1,7 @@
 #include "types.h"
 #include "user.h"
 
-#define NCHILD 10
+#define NCHILD 2
 
 int main(int argc, char *argv[])
 {

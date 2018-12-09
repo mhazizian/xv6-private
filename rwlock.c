@@ -32,32 +32,35 @@ init_rw_lock(struct rwlock *lock)
 void
 acquire_writer(struct rwlock *lock)
 {
-	entry_section(lock);
+	cprintf("__W: AC: Going to Enter, pid=%d\n", myproc()->pid);
+	// entry_section(lock);
+	// cprintf("W: AC: Enterd entry Section, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
-	while (!lock->resource)
+	while ((xchg(&lock->resource, 0) != 1) || (xchg(&lock->function_lock, 1) != 0))
 		sleep(lock, '\0');
 
-	lock->resource = 0;
+	cprintf("__W: AC: Enterd, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
+
+	// lock->resource = 0;
 	lock->pid = myproc()->pid;
 
 	lock->function_lock = 0;
+	cprintf("Write Entered.\n");
 }
 
 void
 release_writer(struct rwlock *lock)
 {
+	cprintf("__W: RE: Going to entry Section, pid=%d\n", myproc()->pid);
 	entry_section(lock);
+	cprintf("__W: RE: Enterd entry Section, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
-	if (lock->pid == myproc()->pid)
-	{
-		lock->pid = 0;
-		lock->resource = 1;
-		wakeup(lock);
-	}
-	else
-		cprintf("Failed to release the lock!\n");
+	lock->pid = 0;
+	lock->resource = 1;
+	wakeup(lock);
 
 	lock->function_lock = 0;
+	cprintf("Write Released.\n");
 }
 
 void
@@ -81,19 +84,14 @@ release_reader(struct rwlock *lock)
 {
 	entry_section(lock);
 
-	if (lock->pid == myproc()->pid)
+	if (--lock->read_count == 0)
 	{
-		if (--lock->read_count == 0)
-		{
-			// while (!lock->resource)
-			// 	sleep(lock, '\0');
-			// lock->resource = 0;
-			lock->resource = 1;
-			lock->pid = myproc()->pid;
-		}
+		// while (!lock->resource)
+		// 	sleep(lock, '\0');
+		// lock->resource = 0;
+		lock->resource = 1;
+		lock->pid = myproc()->pid;
 	}
-	else
-		cprintf("Failed to release the lock!\n");
 
 	lock->function_lock = 0;
 }
