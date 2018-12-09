@@ -15,9 +15,6 @@ entry_section(struct rwlock *lock)
 {
 	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
-	// while(lock->function_lock == 1)
-	// 	sleep(lock, '\0');
-	// lock->function_lock = 1;
 }
 
 void
@@ -26,6 +23,7 @@ init_rw_lock(struct rwlock *lock)
 	lock->function_lock = 0;
 	lock->resource = 1;
 	lock->read_count = 0;
+	lock->write_count = 0;
 	lock->pid = 0;
 }
 
@@ -41,7 +39,6 @@ acquire_writer(struct rwlock *lock)
 
 	cprintf("__W: AC: Enterd, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
-	// lock->resource = 0;
 	lock->pid = myproc()->pid;
 
 	lock->function_lock = 0;
@@ -57,9 +54,9 @@ release_writer(struct rwlock *lock)
 
 	lock->pid = 0;
 	lock->resource = 1;
-	wakeup(lock);
-
 	lock->function_lock = 0;
+	wakeup(lock);
+	
 	cprintf("Write Released.\n");
 }
 
