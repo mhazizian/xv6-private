@@ -596,8 +596,6 @@ rwtest(uint pattern)
 			break;
 		}
 
-	cprintf("I:  %d\n", i);
-
 	for (; i >= 0; i--)
 	{
 		// 0 : Reader
