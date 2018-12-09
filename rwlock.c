@@ -1,4 +1,4 @@
-// Readers-Writers locks
+// Readers-Writers locks with privilage to readers.
 
 #include "types.h"
 #include "defs.h"
@@ -25,8 +25,6 @@ void
 acquire_writer(struct rwlock *lock)
 {
 	cprintf("__W: AC: Going to Enter, pid=%d\n", myproc()->pid);
-	// entry_section(lock);
-	// cprintf("W: AC: Enterd entry Section, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
 	while ((xchg(&lock->resource, 0) != 1) || (xchg(&lock->function_lock, 1) != 0))
 		sleep(lock, '\0');
@@ -35,9 +33,10 @@ acquire_writer(struct rwlock *lock)
 
 	lock->pid = myproc()->pid;
 	lock->write_lock = 1;
+	
 	lock->function_lock = 0;
 
-	cprintf("Write Entered.\n");
+	cprintf("__W: AC: Write Entered.\n");
 }
 
 void
@@ -46,28 +45,34 @@ release_writer(struct rwlock *lock)
 	cprintf("__W: RE: Going to entry Section, pid=%d\n", myproc()->pid);
 	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
+
 	cprintf("__W: RE: Enterd entry Section, pid=%d, resource=%d\n", myproc()->pid, lock->resource);
 
 	lock->pid = 0;
 
-	lock->function_lock = 0;
+	
 	lock->resource = 1;
 	lock->write_lock = 0;
+
+	lock->function_lock = 0;
 	wakeup(lock);
 	
-	cprintf("Write Released.\n");
+	cprintf("__W: RE: Write Released.\n");
 }
 
 void
 acquire_reader(struct rwlock *lock)
 {
+	cprintf("__R: AC: Going to entry Section, pid=%d\n", myproc()->pid);
+
 	while(xchg(&lock->function_lock, 1) != 0 || (lock->write_lock))
 		sleep(lock, '\0');
+
+	cprintf("__R: AC: Enterd, pid=%d\n", myproc()->pid);
 
 	lock->read_count++;
 	lock->resource = 0;
 	lock->pid = myproc()->pid;
-
 
 	lock->function_lock = 0;
 }
@@ -75,16 +80,15 @@ acquire_reader(struct rwlock *lock)
 void
 release_reader(struct rwlock *lock)
 {
+	cprintf("__R: RE: Going to entry Section, pid=%d\n", myproc()->pid);
+
 	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
 
+	cprintf("__R: RE: Enterd, pid=%d\n", myproc()->pid);
+
 	if (--lock->read_count == 0)
 	{
-		// TODO
-		// while (!lock->resource)
-		// 	sleep(lock, '\0');
-
-		// lock->resource = 0;
 		lock->resource = 1;
 		lock->pid = myproc()->pid;
 	}

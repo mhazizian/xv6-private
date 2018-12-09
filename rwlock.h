@@ -3,6 +3,7 @@
 struct rwlock {
 	// It's been initialized like semaphores
 	// - allow only one writer to enter critical section.
+	// - forbid writer to enter critical section when there is at least one reader.
 	unsigned int resource;		
 
 	// forbid readers to enter critical section when a writer is writing.
@@ -19,6 +20,6 @@ struct rwlock {
 	// for atomic acquire and release functions
 	unsigned int function_lock; 
 
-	// Process holding lock
+	// Process holding lock, debug purpose
 	unsigned int pid;			
 };
