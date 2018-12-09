@@ -159,6 +159,14 @@ void                        release_writer(struct rwlock*);
 void                        acquire_reader(struct rwlock*);
 void                        release_reader(struct rwlock*);
 
+// rwlock_pw.c
+
+void                        init_rw_pw_lock(struct rwlock*);
+void                        acquire_pw_writer(struct rwlock*);
+void                        release_pw_writer(struct rwlock*);
+void                        acquire_pw_reader(struct rwlock*);
+void                        release_pw_reader(struct rwlock*);
+
 // string.c
 int						 memcmp(const void*, const void*, uint);
 void*					 memmove(void*, const void*, uint);
