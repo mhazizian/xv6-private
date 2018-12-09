@@ -13,9 +13,11 @@
 void
 entry_section(struct rwlock *lock)
 {
-	while(lock->function_lock == 1)
+	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
-	lock->function_lock = 1;
+	// while(lock->function_lock == 1)
+	// 	sleep(lock, '\0');
+	// lock->function_lock = 1;
 }
 
 void
@@ -83,9 +85,10 @@ release_reader(struct rwlock *lock)
 	{
 		if (--lock->read_count == 0)
 		{
-			while (!lock->resource)
-				sleep(lock, '\0');
-			lock->resource = 0;
+			// while (!lock->resource)
+			// 	sleep(lock, '\0');
+			// lock->resource = 0;
+			lock->resource = 1;
 			lock->pid = myproc()->pid;
 		}
 	}
