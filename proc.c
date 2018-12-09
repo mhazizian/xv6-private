@@ -584,8 +584,9 @@ rwinit()
 void
 rwtest(uint pattern)
 {
-	int i;
+	int i, j;
 	int temp_data;
+	int t;
 	uint binary[32];
 	to_binary(pattern, binary);
 	for (i = 31; i >= 0; i--)
@@ -602,7 +603,11 @@ rwtest(uint pattern)
 		if (!binary[i])
 		{
 			acquire_reader(&rw_test_lock);
-			cprintf("READER: data: %d\n", rw_test_data);
+			cprintf("### READER: data: %d, 1, pid:%d\n", rw_test_data, myproc()->pid);
+			for(j=0; j < 5000; j++)
+				t++;
+			cprintf("### READER: data: %d, 2, pid:%d\n", rw_test_data, myproc()->pid);
+
 			release_reader(&rw_test_lock);
 		}
 		else
@@ -610,7 +615,7 @@ rwtest(uint pattern)
 			acquire_writer(&rw_test_lock);
 
 			temp_data = rw_test_data++;
-			cprintf("WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
+			cprintf("--- WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
 
 			release_writer(&rw_test_lock);
 		}
