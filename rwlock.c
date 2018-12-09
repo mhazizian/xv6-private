@@ -13,9 +13,11 @@
 void
 entry_section(struct rwlock *lock)
 {
-	while(lock->function_lock == 1)
+	while(xchg(&lock->function_lock, 1) != 0)
 		sleep(lock, '\0');
-	lock->function_lock = 1;
+	// while(lock->function_lock == 1)
+	// 	sleep(lock, '\0');
+	// lock->function_lock = 1;
 }
 
 void
