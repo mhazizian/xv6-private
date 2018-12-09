@@ -17,6 +17,7 @@ init_rw_lock(struct rwlock *lock)
 	lock->resource = 1;
 	lock->read_count = 0;
 	lock->write_count = 0;
+	lock->write_lock = 0;
 	lock->pid = 0;
 }
 
