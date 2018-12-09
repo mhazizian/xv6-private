@@ -152,18 +152,12 @@ void						releaseticket(struct ticketlock *lk);
 
 // rwlock.c
 
-void
-entry_section(struct rwlock *lock);
-void
-init_rw_lock(struct rwlock *lock);
-void
-acquire_writer(struct rwlock *lock);
-void
-release_writer(struct rwlock *lock);
-void
-acquire_reader(struct rwlock *lock);
-void
-release_reader(struct rwlock *lock);
+void                        entry_section(struct rwlock*);
+void                        init_rw_lock(struct rwlock*);
+void                        acquire_writer(struct rwlock*);
+void                        release_writer(struct rwlock*);
+void                        acquire_reader(struct rwlock*);
+void                        release_reader(struct rwlock*);
 
 // string.c
 int						 memcmp(const void*, const void*, uint);

@@ -108,11 +108,18 @@ sys_ticketlocktest(void)
 int
 sys_rwinit(void)
 {
+	rwinit();
 	return 0;
 }
 
 int
-sys_rwtest(uint pattern)
+sys_rwtest(void)
 {
+	int pattern;
+
+	if(argint(0, &pattern) < 0)
+		return -1;
+	
+	rwtest((uint)pattern);
 	return 0;
 }

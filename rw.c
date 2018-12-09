@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
 	int pid, i;
 //	struct ticketlock lock;
-	ticketlockinit();
+	rwinit();
 
 	pid = fork();
 	for (i = 0; i < NCHILD; ++i)
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	else if (pid == 0)
 	{
 //		printf(1, "child adding to shared counter\n");
-		ticketlocktest();
+		rwtest(6); // 110
 	}
 	else
 	{

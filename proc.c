@@ -15,8 +15,10 @@ struct {
 } ptable;
 
 static struct proc *initproc;
+struct rwlock rw_test_lock;
 
 int nextpid = 1;
+int rw_test_data = 0;
 
 extern void forkret(void);
 extern void trapret(void);
@@ -572,8 +574,6 @@ to_binary(uint pattern, uint binary[])
 	}
 }
 
-struct rwlock rw_test_lock;
-
 void
 rwinit()
 {
@@ -585,16 +585,34 @@ void
 rwtest(uint pattern)
 {
 	int i;
+	int temp_data;
 	uint binary[32];
 	to_binary(pattern, binary);
-	for (i = 31; i >= 0 && binary[i] == 0; i--);
+	for (i = 31; i >= 0; i--)
+		if (binary[i] == 1) {
+			i--;
+			break;
+		}
 
-	for (i-- ; i >= 0; i--)
+	cprintf("I:  %d\n", i);
+
+	for (; i >= 0; i--)
 	{
 		// 0 : Reader
 		if (!binary[i])
 		{
+			acquire_reader(&rw_test_lock);
+			cprintf("READER: data: %d\n", rw_test_data);
+			release_reader(&rw_test_lock);
+		}
+		else
+		{
+			acquire_writer(&rw_test_lock);
 
+			temp_data = rw_test_data++;
+			cprintf("WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
+
+			release_writer(&rw_test_lock);
 		}
 	}
 }
