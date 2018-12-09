@@ -86,9 +86,10 @@ release_reader(struct rwlock *lock)
 	{
 		if (--lock->read_count == 0)
 		{
-			while (!lock->resource)
-				sleep(lock, '\0');
-			lock->resource = 0;
+			// while (!lock->resource)
+			// 	sleep(lock, '\0');
+			// lock->resource = 0;
+			lock->resource = 1;
 			lock->pid = myproc()->pid;
 		}
 	}
