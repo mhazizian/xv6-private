@@ -577,8 +577,7 @@ to_binary(uint pattern, uint binary[])
 void
 rwinit()
 {
-	// init_rw_lock(&rw_test_lock);
-	init_rw_pw_lock(&rw_test_lock);
+	init_rw_lock(&rw_test_lock);
 }
 
 
@@ -601,8 +600,55 @@ rwtest(uint pattern)
 		// 0 : Reader
 		if (!binary[i])
 		{
+			acquire_reader(&rw_test_lock);
+
+			cprintf("### READER: data: %d, 1, pid:%d\n", rw_test_data, myproc()->pid);
+			for(j=0; j < 5000; j++)
+				t++;
+			cprintf("### READER: data: %d, 2, pid:%d\n", rw_test_data, myproc()->pid);
+
+			release_reader(&rw_test_lock);
+		}
+		else
+		{
+			acquire_writer(&rw_test_lock);
+
+			temp_data = rw_test_data++;
+			cprintf("--- WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
+
+			release_writer(&rw_test_lock);
+		}
+	}
+}
+
+
+void
+rwinit_pw()
+{
+	init_rw_pw_lock(&rw_test_lock);
+}
+
+
+void
+rwtest_pw(uint pattern)
+{
+	int i, j;
+	int temp_data;
+	int t;
+	uint binary[32];
+	to_binary(pattern, binary);
+	for (i = 31; i >= 0; i--)
+		if (binary[i] == 1) {
+			i--;
+			break;
+		}
+
+	for (; i >= 0; i--)
+	{
+		// 0 : Reader
+		if (!binary[i])
+		{
 			acquire_pw_reader(&rw_test_lock);
-			// acquire_reader(&rw_test_lock);
 
 			cprintf("### READER: data: %d, 1, pid:%d\n", rw_test_data, myproc()->pid);
 			for(j=0; j < 5000; j++)
@@ -610,18 +656,15 @@ rwtest(uint pattern)
 			cprintf("### READER: data: %d, 2, pid:%d\n", rw_test_data, myproc()->pid);
 
 			release_pw_reader(&rw_test_lock);
-			// release_reader(&rw_test_lock);
 		}
 		else
 		{
 			acquire_pw_writer(&rw_test_lock);
-			// acquire_writer(&rw_test_lock);
 
 			temp_data = rw_test_data++;
 			cprintf("--- WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
 
 			release_pw_writer(&rw_test_lock);
-			// release_writer(&rw_test_lock);
 		}
 	}
 }

@@ -123,3 +123,21 @@ sys_rwtest(void)
 	rwtest((uint)pattern);
 	return 0;
 }
+int
+sys_rwinit_pw(void)
+{
+	rwinit_pw();
+	return 0;
+}
+
+int
+sys_rwtest_pw(void)
+{
+	int pattern;
+
+	if(argint(0, &pattern) < 0)
+		return -1;
+	
+	rwtest_pw((uint)pattern);
+	return 0;
+}

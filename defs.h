@@ -126,6 +126,8 @@ void						ticketlockinit(void);
 void						ticketlocktest(void);
 void						rwinit(void);
 void						rwtest(uint pattern);
+void						rwinit_pw(void);
+void						rwtest_pw(uint pattern);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
