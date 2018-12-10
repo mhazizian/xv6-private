@@ -31,7 +31,6 @@ acquireticket(struct ticketlock *lk)
 void
 releaseticket(struct ticketlock *lk)
 {
-	// TODO : check this later!
 	if (lk->pid == myproc()->pid)
 	{
 		lk->pid = 0;
