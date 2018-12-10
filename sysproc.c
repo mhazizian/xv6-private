@@ -141,3 +141,21 @@ sys_rwtest_pw(void)
 	rwtest_pw((uint)pattern);
 	return 0;
 }
+int
+sys_rwinit_ticket(void)
+{
+	rwinit_ticket();
+	return 0;
+}
+
+int
+sys_rwtest_ticket(void)
+{
+	int pattern;
+
+	if(argint(0, &pattern) < 0)
+		return -1;
+	
+	rwtest_ticket((uint)pattern);
+	return 0;
+}

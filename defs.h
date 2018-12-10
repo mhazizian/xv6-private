@@ -11,6 +11,7 @@ struct stat;
 struct superblock;
 struct ticketlock;
 struct rwlock;
+struct rwlock_ticket;
 
 // bio.c
 void						binit(void);
@@ -128,6 +129,8 @@ void						rwinit(void);
 void						rwtest(uint pattern);
 void						rwinit_pw(void);
 void						rwtest_pw(uint pattern);
+void						rwinit_ticket(void);
+void						rwtest_ticket(uint pattern);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
@@ -168,6 +171,15 @@ void                        acquire_pw_writer(struct rwlock*);
 void                        release_pw_writer(struct rwlock*);
 void                        acquire_pw_reader(struct rwlock*);
 void                        release_pw_reader(struct rwlock*);
+
+// rwlock_ticket.c
+
+void                        init_rw_ticket_lock(struct rwlock_ticket*);
+void                        acquire_ticket_writer(struct rwlock_ticket*);
+void                        release_ticket_writer(struct rwlock_ticket*);
+void                        acquire_ticket_reader(struct rwlock_ticket*);
+void                        release_ticket_reader(struct rwlock_ticket*);
+
 
 // string.c
 int						 memcmp(const void*, const void*, uint);

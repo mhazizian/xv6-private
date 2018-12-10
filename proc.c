@@ -8,6 +8,7 @@
 #include "spinlock.h"
 #include "ticketlock.h"
 #include "rwlock.h"
+#include "rwlock_ticket.h"
 
 struct {
 	struct spinlock lock;
@@ -16,8 +17,12 @@ struct {
 
 static struct proc *initproc;
 struct rwlock rw_test_lock;
+struct rwlock_ticket rw_test_ticket_lock;
+struct ticketlock test_ticket_lock;
+
 
 int nextpid = 1;
+int ticketlock_test_data = 0;
 int rw_test_data = 0;
 
 extern void forkret(void);
@@ -541,23 +546,20 @@ procdump(void)
 	}
 }
 
-struct ticketlock lk;
-int global_variable = 0;
-
 void
 ticketlockinit()
 {
-	initticketlock(&lk);
+	initticketlock(&test_ticket_lock);
 }
 
 void
 ticketlocktest()
 {
-	acquireticket(&lk);
-	 cprintf("current value: %d ", global_variable);
-	global_variable++;
-	 cprintf("new value: %d\n", global_variable);
-	releaseticket(&lk);
+	acquireticket(&test_ticket_lock);
+	 cprintf("current value: %d ", ticketlock_test_data);
+	ticketlock_test_data++;
+	 cprintf("new value: %d\n", ticketlock_test_data);
+	releaseticket(&test_ticket_lock);
 }
 
 void
@@ -631,6 +633,55 @@ rwinit_pw()
 
 void
 rwtest_pw(uint pattern)
+{
+	int i, j;
+	int temp_data;
+	int t;
+	uint binary[32];
+	to_binary(pattern, binary);
+	for (i = 31; i >= 0; i--)
+		if (binary[i] == 1) {
+			i--;
+			break;
+		}
+
+	for (; i >= 0; i--)
+	{
+		// 0 : Reader
+		if (!binary[i])
+		{
+			acquire_pw_reader(&rw_test_lock);
+
+			cprintf("### READER: data: %d, 1, pid:%d\n", rw_test_data, myproc()->pid);
+			for(j=0; j < 5000; j++)
+				t++;
+			cprintf("### READER: data: %d, 2, pid:%d\n", rw_test_data, myproc()->pid);
+
+			release_pw_reader(&rw_test_lock);
+		}
+		else
+		{
+			acquire_pw_writer(&rw_test_lock);
+
+			temp_data = rw_test_data++;
+			cprintf("--- WRITER: new_data: %d, old_data: %d\n", rw_test_data, temp_data);
+
+			release_pw_writer(&rw_test_lock);
+		}
+	}
+}
+
+
+
+void
+rwinit_ticket()
+{
+	init_rw_pw_lock(&rw_test_lock);
+}
+
+
+void
+rwtest_ticket(uint pattern)
 {
 	int i, j;
 	int temp_data;

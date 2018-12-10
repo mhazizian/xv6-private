@@ -30,6 +30,8 @@ void rwinit();
 void rwtest(uint);
 void rwinit_pw();
 void rwtest_pw(uint);
+void rwinit_ticket();
+void rwtest_ticket(uint);
 
 // ulib.c
 int stat(const char*, struct stat*);

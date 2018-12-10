@@ -26,3 +26,5 @@
 #define SYS_rwtest	25
 #define SYS_rwinit_pw	26
 #define SYS_rwtest_pw	27
+#define SYS_rwinit_ticket	 28
+#define SYS_rwtest_ticket	 29
