@@ -92,7 +92,7 @@ found:
 	p->pid = nextpid++;
 	// @TODO set priority:
 	p->priority = 2;
-	cmostime(&(p->time));
+	p->time = ticks;
 
 	release(&ptable.lock);
 
@@ -399,7 +399,7 @@ sched(void)
 		panic("sched interruptible");
 	intena = mycpu()->intena;
 
-	add_to_fcfs_sched(p);
+	// add_to_fcfs_sched(p);
 	
 	swtch(&p->context, mycpu()->scheduler);
 	mycpu()->intena = intena;
@@ -570,9 +570,9 @@ pstat(void)
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
 			continue;
-		cprintf("%s\t%d\t%s\t%d\t%d:%d:%d\n", p->name, p->pid,
+		cprintf("%s\t%d\t%s\t%d\t%d\n", p->name, p->pid,
 			proc_state_caption[p->state], p->priority,
-			p->time.hour, p->time.minute, p->time.second
+			p->time
 		);
 	}
 	cprintf("######################################################\n");

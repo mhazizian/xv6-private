@@ -99,7 +99,7 @@ exec(char *path, char **argv)
 	curproc->sz = sz;
 	curproc->tf->eip = elf.entry;	// main
 	curproc->tf->esp = sp;
-	cmostime(&(curproc->time));
+	curproc->time = ticks;
 	// @TODO : set priority
 	switchuvm(curproc);
 	freevm(oldpgdir);
