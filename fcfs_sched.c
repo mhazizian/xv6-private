@@ -25,6 +25,7 @@ add_to_fcfs_sched(struct proc* p)
     acquire(&FCFS_queue.lock);
 
     FCFS_queue.procs[FCFS_queue.head] = p;
+    // @TODO user rem with NPROC
     FCFS_queue.head++;
 
     release(&FCFS_queue.lock);
@@ -36,6 +37,7 @@ get_from_fcfs_sched(void)
     acquire(&FCFS_queue.lock);
 
     struct proc* p = FCFS_queue.procs[FCFS_queue.tail];
+    // @TODO user rem with NPROC
     FCFS_queue.tail++;
 
     release(&FCFS_queue.lock);

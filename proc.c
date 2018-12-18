@@ -387,7 +387,7 @@ sched(void)
 {
 	int intena;
 	struct proc *p = myproc();
-	add_to_fcfs_sched(p);
+	
 
 	if(!holding(&ptable.lock))
 		panic("sched ptable.lock");
@@ -398,6 +398,9 @@ sched(void)
 	if(readeflags()&FL_IF)
 		panic("sched interruptible");
 	intena = mycpu()->intena;
+
+	add_to_fcfs_sched(p);
+	
 	swtch(&p->context, mycpu()->scheduler);
 	mycpu()->intena = intena;
 }
