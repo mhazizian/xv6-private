@@ -360,7 +360,6 @@ lottery_scheduler(void){
         if (sum_of_tickets >= t){
             switch_context(c, p);
         }
-
     }
 
 }
