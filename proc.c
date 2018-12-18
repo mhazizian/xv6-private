@@ -125,6 +125,7 @@ userinit(void)
 	extern char _binary_initcode_start[], _binary_initcode_size[];
 
 	p = allocproc();
+	// @TODO check whether time is set of not.
 	init_sched_queue();
 	
 	initproc = p;
@@ -535,4 +536,10 @@ procdump(void)
 		}
 		cprintf("\n");
 	}
+}
+
+void
+pstat(void)
+{
+	cprintf("completing.\n");
 }
