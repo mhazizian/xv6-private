@@ -6,7 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-
+#include "fcfs_sched.h"
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -124,6 +124,7 @@ userinit(void)
 	extern char _binary_initcode_start[], _binary_initcode_size[];
 
 	p = allocproc();
+	init_sched_queue();
 	
 	initproc = p;
 	if((p->pgdir = setupkvm()) == 0)
@@ -367,6 +368,7 @@ sched(void)
 {
 	int intena;
 	struct proc *p = myproc();
+	add_to_fcfs_sched(p);
 
 	if(!holding(&ptable.lock))
 		panic("sched ptable.lock");
@@ -486,8 +488,9 @@ kill(int pid)
 		if(p->pid == pid){
 			p->killed = 1;
 			// Wake process from sleep if necessary.
-			if(p->state == SLEEPING)
+			if(p->state == SLEEPING) {
 				p->state = RUNNABLE;
+			}
 			release(&ptable.lock);
 			return 0;
 		}

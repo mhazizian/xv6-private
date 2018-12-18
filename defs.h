@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct proc_queue;
 
 // bio.c
 void						binit(void);
@@ -123,6 +124,10 @@ void						yield(void);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
+
+//fcfs_sched.c
+void                        add_to_fcfs_sched(struct proc*);
+void                        init_sched_queue(void);
 
 // spinlock.c
 void						acquire(struct spinlock*);

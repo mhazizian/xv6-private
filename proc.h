@@ -56,3 +56,11 @@ struct proc {
 //	 original data and bss
 //	 fixed-size stack
 //	 expandable heap
+
+
+// struct proc_queue
+// {
+// 	struct proc* procs[NPROC];
+// 	unsigned int head;
+// 	unsigned int tail;
+// };
