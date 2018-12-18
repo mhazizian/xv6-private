@@ -6,7 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-// #include "fcfs_sched.h"
+#include "fcfssched.h"
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -129,8 +129,6 @@ userinit(void)
 	extern char _binary_initcode_start[], _binary_initcode_size[];
 
 	p = allocproc();
-	// @TODO check whether time is set of not.
-	init_sched_queue();
 	
 	initproc = p;
 	if((p->pgdir = setupkvm()) == 0)
@@ -156,6 +154,7 @@ userinit(void)
 	acquire(&ptable.lock);
 
 	p->state = RUNNABLE;
+	add_to_fcfs_sched(p);
 
 	release(&ptable.lock);
 }
@@ -222,6 +221,7 @@ fork(void)
 	acquire(&ptable.lock);
 
 	np->state = RUNNABLE;
+	add_to_fcfs_sched(np);
 
 	release(&ptable.lock);
 
@@ -340,20 +340,22 @@ scheduler(void)
 		// Loop over process table looking for process to run.
 		acquire(&ptable.lock);
 
-		// if (!fcfs_is_empty()) {
-		// if (0) {
-		// 	p = get_from_fcfs_sched();
-		// 	c->proc = p;
-		// 	switchuvm(p);
-		// 	p->state = RUNNING;
+		if (!fcfs_is_empty()) {
+		// if (1) {
+			p = get_from_fcfs_sched();
+			c->proc = p;
+			switchuvm(p);
+			p->state = RUNNING;
+			swtch(&(c->scheduler), p->context);
+			switchkvm();
+			c->proc = 0;
 
-		// 	swtch(&(c->scheduler), p->context);
-		// 	switchkvm();
-
-		// } else {
+		} else {
 			for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 				if(p->state != RUNNABLE)
 					continue;
+
+				cprintf("# fcfs was empty\n");
 
 				// Switch to chosen process.	It is the process's job
 				// to release ptable.lock and then reacquire it
@@ -369,7 +371,7 @@ scheduler(void)
 				// It should have changed its p->state before coming back.
 				c->proc = 0;
 			}
-		// }
+		}
 		release(&ptable.lock);
 
 	}
@@ -409,8 +411,13 @@ sched(void)
 void
 yield(void)
 {
+	struct proc* p;
 	acquire(&ptable.lock);	//DOC: yieldlock
-	myproc()->state = RUNNABLE;
+	p = myproc();
+	p->state = RUNNABLE;
+	add_to_fcfs_sched(p);
+	// myproc()->state = RUNNABLE;
+
 	sched();
 	release(&ptable.lock);
 }
@@ -484,8 +491,10 @@ wakeup1(void *chan)
 	struct proc *p;
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-		if(p->state == SLEEPING && p->chan == chan)
+		if(p->state == SLEEPING && p->chan == chan) {
 			p->state = RUNNABLE;
+			add_to_fcfs_sched(p);
+		}
 }
 
 // Wake up all processes sleeping on chan.
@@ -512,6 +521,7 @@ kill(int pid)
 			// Wake process from sleep if necessary.
 			if(p->state == SLEEPING) {
 				p->state = RUNNABLE;
+				add_to_fcfs_sched(p);
 			}
 			release(&ptable.lock);
 			return 0;
@@ -562,6 +572,7 @@ void
 pstat(void)
 {
 	struct proc* p;
+	init_sched_queue();
 	acquire(&ptable.lock);
 
 	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");

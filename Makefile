@@ -17,6 +17,7 @@ OBJS = \
 	proc.o\
 	sleeplock.o\
 	spinlock.o\
+	fcfssched.o\
 	string.o\
 	swtch.o\
 	syscall.o\
@@ -27,7 +28,7 @@ OBJS = \
 	uart.o\
 	vectors.o\
 	vm.o\
-	fcfs_sched.o\
+	
 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf

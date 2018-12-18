@@ -5,7 +5,6 @@
 struct proc_queue
 {
 	struct proc* procs[NPROC];
-	struct spinlock lock;
 	uint head;
 	uint tail;
 };

@@ -66,6 +66,7 @@ struct proc {
 // struct proc_queue
 // {
 // 	struct proc* procs[NPROC];
-// 	unsigned int head;
-// 	unsigned int tail;
+// 	// struct spinlock lock;
+// 	uint head;
+// 	uint tail;
 // };
