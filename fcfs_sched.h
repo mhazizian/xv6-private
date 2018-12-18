@@ -6,6 +6,6 @@ struct proc_queue
 {
 	struct proc* procs[NPROC];
 	struct spinlock lock;
-	unsigned int head;
-	unsigned int tail;
+	uint head;
+	uint tail;
 };

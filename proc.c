@@ -190,6 +190,7 @@ fork(void)
 	int i, pid;
 	struct proc *np;
 	struct proc *curproc = myproc();
+	add_to_fcfs_sched(curproc);
 
 	// Allocate process.
 	if((np = allocproc()) == 0){

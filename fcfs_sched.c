@@ -1,4 +1,5 @@
 #include "types.h"
+#include "types.h"
 #include "defs.h"
 #include "param.h"
 #include "x86.h"
@@ -7,6 +8,8 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "fcfs_sched.h"
+
+
 
 struct proc_queue FCFS_queue;
 
@@ -22,25 +25,26 @@ void
 add_to_fcfs_sched(struct proc* p)
 {
 	// complete thid func.
-    acquire(&FCFS_queue.lock);
+    // acquire(&FCFS_queue.lock);
+    cprintf("salam\n");
 
     FCFS_queue.procs[FCFS_queue.head] = p;
     // @TODO user rem with NPROC
     FCFS_queue.head++;
 
-    release(&FCFS_queue.lock);
+    // release(&FCFS_queue.lock);
 }
 
 struct proc*
 get_from_fcfs_sched(void)
 {
-    acquire(&FCFS_queue.lock);
+    // acquire(&FCFS_queue.lock);
 
     struct proc* p = FCFS_queue.procs[FCFS_queue.tail];
     // @TODO user rem with NPROC
     FCFS_queue.tail++;
 
-    release(&FCFS_queue.lock);
+    // release(&FCFS_queue.lock);
     return p;
 }
 
