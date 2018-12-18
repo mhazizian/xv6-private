@@ -1,3 +1,4 @@
+#include "rand.h"
 #include "types.h"
 #include "defs.h"
 #include "param.h"
@@ -321,6 +322,44 @@ wait(void)
 		// Wait for children to exit.	(See wakeup1 call in proc_exit.)
 		sleep(curproc, &ptable.lock);	//DOC: wait-sleep
 	}
+}
+
+
+void
+lottery_scheduler(void){
+    struct proc *p;
+    struct cpu *c = mycpu();
+    c->proc = 0;
+    long sum_of_tickets = 0;
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+            continue;
+        sum_of_tickets += p->ticket_number;
+    }
+
+    long t;
+    t = random_at_most(sum_of_tickets);
+    sum_of_tickets = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+            continue;
+        sum_of_tickets += p->ticket_number;
+        if (sum_of_tickets >= t){
+            c->proc = p;
+            switchuvm(p);
+            p->state = RUNNING;
+
+            swtch(&(c->scheduler), p->context);
+            switchkvm();
+
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+            c->proc = 0;
+        }
+
+    }
+
 }
 
 void
