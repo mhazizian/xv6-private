@@ -17,19 +17,36 @@ init_sched_queue(void)
     FCFS_queue.tail = 0;
 }
 
+
 void
 add_to_fcfs_sched(struct proc* p)
 {
 	// complete thid func.
-    // is lock required?
+    acquire(&FCFS_queue.lock);
+
     FCFS_queue.procs[FCFS_queue.head] = p;
     FCFS_queue.head++;
+
+    release(&FCFS_queue.lock);
 }
 
 struct proc*
 get_from_fcfs_sched(void)
 {
-    // is lock required?
-    return FCFS_queue.procs[FCFS_queue.tail++];
+    acquire(&FCFS_queue.lock);
+
+    struct proc* p = FCFS_queue.procs[FCFS_queue.tail];
+    FCFS_queue.tail++;
+
+    release(&FCFS_queue.lock);
+    return p;
 }
+
+int
+fcfs_is_empty(void)
+{
+    return (FCFS_queue.head == FCFS_queue.tail);
+}
+
+
 
