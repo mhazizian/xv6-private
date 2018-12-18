@@ -6,7 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "fcfs_sched.h"
+// #include "fcfs_sched.h"
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -190,7 +190,6 @@ fork(void)
 	int i, pid;
 	struct proc *np;
 	struct proc *curproc = myproc();
-	add_to_fcfs_sched(curproc);
 
 	// Allocate process.
 	if((np = allocproc()) == 0){
@@ -342,16 +341,16 @@ scheduler(void)
 		acquire(&ptable.lock);
 
 		// if (!fcfs_is_empty()) {
-		if (0) {
-			p = get_from_fcfs_sched();
-			c->proc = p;
-			switchuvm(p);
-			p->state = RUNNING;
+		// if (0) {
+		// 	p = get_from_fcfs_sched();
+		// 	c->proc = p;
+		// 	switchuvm(p);
+		// 	p->state = RUNNING;
 
-			swtch(&(c->scheduler), p->context);
-			switchkvm();
+		// 	swtch(&(c->scheduler), p->context);
+		// 	switchkvm();
 
-		} else {
+		// } else {
 			for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 				if(p->state != RUNNABLE)
 					continue;
@@ -370,7 +369,7 @@ scheduler(void)
 				// It should have changed its p->state before coming back.
 				c->proc = 0;
 			}
-		}
+		// }
 		release(&ptable.lock);
 
 	}

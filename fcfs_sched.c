@@ -26,7 +26,7 @@ add_to_fcfs_sched(struct proc* p)
 {
 	// complete thid func.
     // acquire(&FCFS_queue.lock);
-    cprintf("salam\n");
+    // cprintf("salam\n");
 
     FCFS_queue.procs[FCFS_queue.head] = p;
     // @TODO user rem with NPROC
