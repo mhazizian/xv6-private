@@ -12,6 +12,8 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
+char* proc_state_caption[6] = { "UNUSED__", "EMBRYO__", "SLEEPING", "RUNNABLE", "RUNNING_", "ZOMBIE__" };
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -541,5 +543,16 @@ procdump(void)
 void
 pstat(void)
 {
-	cprintf("completing.\n");
+	struct proc* p;
+	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");
+	cprintf("_____________________________________________________\n");
+
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		if (p->state == UNUSED)
+			continue;
+		cprintf("%s\t%d\t%s\t%d\t%d:%d:%d\n", p->name, p->pid, proc_state_caption[p->state], 1, p->time.hour, p->time.minute, p->time.second);
+	}
+
+	release(&ptable.lock);
 }
