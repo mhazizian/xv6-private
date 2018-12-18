@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "fcfssched.h"
+
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -91,7 +92,7 @@ found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
 	// @TODO set priority:
-	p->priority = 2;
+	p->priority = ticks % 9 + 1;
 	p->time = ticks;
 
 	release(&ptable.lock);
@@ -318,6 +319,67 @@ wait(void)
 	}
 }
 
+void
+roundrobin() {
+	struct proc *p;
+	struct cpu *c = mycpu();
+	c->proc = 0;
+
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		if(p->state != RUNNABLE)
+			continue;
+
+		// Switch to chosen process.	It is the process's job
+		// to release ptable.lock and then reacquire it
+		// before jumping back to us.
+		c->proc = p;
+		switchuvm(p);
+		p->state = RUNNING;
+
+		swtch(&(c->scheduler), p->context);
+		switchkvm();
+
+		// Process is done running for now.
+		// It should have changed its p->state before coming back.
+		c->proc = 0;
+	}
+}
+
+void
+priority_scheduler() {
+	struct proc *p;
+	struct cpu *c = mycpu();
+    int max = -1, max_index = -1;
+    int i = 0;
+	c->proc = 0;
+
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++, i++){
+		if(p->state != RUNNABLE)
+			continue;
+
+        if (max < p->priority) {
+            max = p->priority;
+            max_index = i;
+        }
+	}
+
+    if (max_index != -1) {    
+        p = &ptable.proc[max_index];
+        // Switch to chosen process.	It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+    }
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -332,13 +394,13 @@ scheduler(void)
 	struct proc *p;
 	struct cpu *c = mycpu();
 	c->proc = 0;
-	
 	for(;;){
 		// Enable interrupts on this processor.
 		sti();
 
 		// Loop over process table looking for process to run.
 		acquire(&ptable.lock);
+
 
 		if (!fcfs_is_empty()) {
 		// if (1) {
@@ -372,8 +434,11 @@ scheduler(void)
 				c->proc = 0;
 			}
 		}
-		release(&ptable.lock);
+		// roundrobin();
 
+		// for priority Sched:
+		// priority_scheduler();
+		release(&ptable.lock);
 	}
 }
 
@@ -400,8 +465,6 @@ sched(void)
 	if(readeflags()&FL_IF)
 		panic("sched interruptible");
 	intena = mycpu()->intena;
-
-	// add_to_fcfs_sched(p);
 	
 	swtch(&p->context, mycpu()->scheduler);
 	mycpu()->intena = intena;
