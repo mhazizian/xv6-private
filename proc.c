@@ -90,6 +90,8 @@ allocproc(void)
 found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
+	// @TODO set priority:
+	p->priority = 2;
 	cmostime(&(p->time));
 
 	release(&ptable.lock);
@@ -552,7 +554,10 @@ pstat(void)
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
 			continue;
-		cprintf("%s\t%d\t%s\t%d\t%d:%d:%d\n", p->name, p->pid, proc_state_caption[p->state], 1, p->time.hour, p->time.minute, p->time.second);
+		cprintf("%s\t%d\t%s\t%d\t%d:%d:%d\n", p->name, p->pid,
+			proc_state_caption[p->state], p->priority,
+			p->time.hour, p->time.minute, p->time.second
+		);
 	}
 	cprintf("######################################################\n");
 
