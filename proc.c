@@ -544,15 +544,17 @@ void
 pstat(void)
 {
 	struct proc* p;
+	acquire(&ptable.lock);
+
 	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");
 	cprintf("_____________________________________________________\n");
 
-	acquire(&ptable.lock);
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
 			continue;
 		cprintf("%s\t%d\t%s\t%d\t%d:%d:%d\n", p->name, p->pid, proc_state_caption[p->state], 1, p->time.hour, p->time.minute, p->time.second);
 	}
+	cprintf("######################################################\n");
 
 	release(&ptable.lock);
 }
