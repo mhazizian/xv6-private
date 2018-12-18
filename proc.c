@@ -24,6 +24,12 @@ extern void trapret(void);
 static void wakeup1(void *chan);
 
 void
+add_to_runnable_queue(struct proc* p) {
+	p->state = RUNNABLE;
+	add_to_fcfs_sched(p);
+}
+
+void
 pinit(void)
 {
 	initlock(&ptable.lock, "ptable");
@@ -154,8 +160,7 @@ userinit(void)
 	// because the assignment might not be atomic.
 	acquire(&ptable.lock);
 
-	p->state = RUNNABLE;
-	add_to_fcfs_sched(p);
+	add_to_runnable_queue(p);
 
 	release(&ptable.lock);
 }
@@ -221,8 +226,7 @@ fork(void)
 
 	acquire(&ptable.lock);
 
-	np->state = RUNNABLE;
-	add_to_fcfs_sched(np);
+	add_to_runnable_queue(np);
 
 	release(&ptable.lock);
 
@@ -320,32 +324,6 @@ wait(void)
 }
 
 void
-roundrobin() {
-	struct proc *p;
-	struct cpu *c = mycpu();
-	c->proc = 0;
-
-	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-		if(p->state != RUNNABLE)
-			continue;
-
-		// Switch to chosen process.	It is the process's job
-		// to release ptable.lock and then reacquire it
-		// before jumping back to us.
-		c->proc = p;
-		switchuvm(p);
-		p->state = RUNNING;
-
-		swtch(&(c->scheduler), p->context);
-		switchkvm();
-
-		// Process is done running for now.
-		// It should have changed its p->state before coming back.
-		c->proc = 0;
-	}
-}
-
-void
 priority_scheduler() {
 	struct proc *p;
 	struct cpu *c = mycpu();
@@ -380,6 +358,47 @@ priority_scheduler() {
     }
 }
 
+void
+fcfs_scheduler()
+{
+	struct proc *p;
+	struct cpu *c = mycpu();
+	c->proc = 0;
+
+	if (!fcfs_is_empty()) {
+	// if (1) {
+		p = get_from_fcfs_sched();
+		c->proc = p;
+		switchuvm(p);
+		p->state = RUNNING;
+		swtch(&(c->scheduler), p->context);
+		switchkvm();
+		c->proc = 0;
+
+	} else {
+		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+			if(p->state != RUNNABLE)
+				continue;
+
+			cprintf("# fcfs was empty\n");
+
+			// Switch to chosen process.	It is the process's job
+			// to release ptable.lock and then reacquire it
+			// before jumping back to us.
+			c->proc = p;
+			switchuvm(p);
+			p->state = RUNNING;
+
+			swtch(&(c->scheduler), p->context);
+			switchkvm();
+
+			// Process is done running for now.
+			// It should have changed its p->state before coming back.
+			c->proc = 0;
+		}
+	}
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -391,9 +410,9 @@ priority_scheduler() {
 void
 scheduler(void)
 {
-	struct proc *p;
-	struct cpu *c = mycpu();
-	c->proc = 0;
+	// struct proc *p;
+	// struct cpu *c = mycpu();
+	// c->proc = 0;
 	for(;;){
 		// Enable interrupts on this processor.
 		sti();
@@ -401,41 +420,7 @@ scheduler(void)
 		// Loop over process table looking for process to run.
 		acquire(&ptable.lock);
 
-
-		if (!fcfs_is_empty()) {
-		// if (1) {
-			p = get_from_fcfs_sched();
-			c->proc = p;
-			switchuvm(p);
-			p->state = RUNNING;
-			swtch(&(c->scheduler), p->context);
-			switchkvm();
-			c->proc = 0;
-
-		} else {
-			for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-				if(p->state != RUNNABLE)
-					continue;
-
-				cprintf("# fcfs was empty\n");
-
-				// Switch to chosen process.	It is the process's job
-				// to release ptable.lock and then reacquire it
-				// before jumping back to us.
-				c->proc = p;
-				switchuvm(p);
-				p->state = RUNNING;
-
-				swtch(&(c->scheduler), p->context);
-				switchkvm();
-
-				// Process is done running for now.
-				// It should have changed its p->state before coming back.
-				c->proc = 0;
-			}
-		}
-		// roundrobin();
-
+		fcfs_scheduler();
 		// for priority Sched:
 		// priority_scheduler();
 		release(&ptable.lock);
@@ -477,9 +462,7 @@ yield(void)
 	struct proc* p;
 	acquire(&ptable.lock);	//DOC: yieldlock
 	p = myproc();
-	p->state = RUNNABLE;
-	add_to_fcfs_sched(p);
-	// myproc()->state = RUNNABLE;
+	add_to_runnable_queue(p);
 
 	sched();
 	release(&ptable.lock);
@@ -554,10 +537,8 @@ wakeup1(void *chan)
 	struct proc *p;
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-		if(p->state == SLEEPING && p->chan == chan) {
-			p->state = RUNNABLE;
-			add_to_fcfs_sched(p);
-		}
+		if(p->state == SLEEPING && p->chan == chan)
+			add_to_runnable_queue(p);
 }
 
 // Wake up all processes sleeping on chan.
@@ -582,10 +563,9 @@ kill(int pid)
 		if(p->pid == pid){
 			p->killed = 1;
 			// Wake process from sleep if necessary.
-			if(p->state == SLEEPING) {
-				p->state = RUNNABLE;
-				add_to_fcfs_sched(p);
-			}
+			if(p->state == SLEEPING)
+				add_to_runnable_queue(p);
+
 			release(&ptable.lock);
 			return 0;
 		}

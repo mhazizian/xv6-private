@@ -100,7 +100,6 @@ exec(char *path, char **argv)
 	curproc->tf->eip = elf.entry;	// main
 	curproc->tf->esp = sp;
 	curproc->time = ticks;
-	// add_to_fcfs_sched(curproc);
 	
 	// @TODO : set priority
 	switchuvm(curproc);

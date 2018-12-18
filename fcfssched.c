@@ -8,15 +8,14 @@
 #include "spinlock.h"
 #include "fcfssched.h"
 
-struct proc_queue FCFS_queue;
+struct proc_queue fcfs_queue;
 struct spinlock fcfs_lock;
 
 void
 init_sched_queue(void)
 {
-    FCFS_queue.head = 0;
-    FCFS_queue.tail = 0;
-    cprintf("salam\n");
+    fcfs_queue.head = 0;
+    fcfs_queue.tail = 0;
 }
 
 
@@ -25,8 +24,8 @@ add_to_fcfs_sched(struct proc* p)
 {
     acquire(&fcfs_lock);
 
-    FCFS_queue.procs[FCFS_queue.head] = p;
-    FCFS_queue.head = (FCFS_queue.head + 1) % NPROC;
+    fcfs_queue.procs[fcfs_queue.head] = p;
+    fcfs_queue.head = (fcfs_queue.head + 1) % NPROC;
 
     release(&fcfs_lock);
 }
@@ -34,12 +33,8 @@ add_to_fcfs_sched(struct proc* p)
 struct proc*
 get_from_fcfs_sched(void)
 {
-    // acquire(&fcfs_lock);
-
-    struct proc* p = FCFS_queue.procs[FCFS_queue.tail];
-    FCFS_queue.tail = (FCFS_queue.tail + 1) % NPROC;
-
-    // release(&fcfs_lock);
+    struct proc* p = fcfs_queue.procs[fcfs_queue.tail];
+    fcfs_queue.tail = (fcfs_queue.tail + 1) % NPROC;
 
     return p;
 }
@@ -47,14 +42,6 @@ get_from_fcfs_sched(void)
 int
 fcfs_is_empty(void)
 {
-    // acquire(&fcfs_lock);
-
-    int res = (FCFS_queue.head == FCFS_queue.tail);
-
-    // release(&fcfs_lock);
-
+    int res = (fcfs_queue.head == fcfs_queue.tail);
     return res;
 }
-
-
-
