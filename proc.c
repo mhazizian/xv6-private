@@ -88,6 +88,7 @@ allocproc(void)
 found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
+	cmostime(&(p->time));
 
 	release(&ptable.lock);
 
