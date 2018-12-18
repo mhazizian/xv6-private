@@ -324,6 +324,18 @@ wait(void)
 	}
 }
 
+void switch_context(struct cpu *c, struct proc *p){
+	c->proc = p;
+	switchuvm(p);
+	p->state = RUNNING;
+
+	swtch(&(c->scheduler), p->context);
+	switchkvm();
+
+	// Process is done running for now.
+	// It should have changed its p->state before coming back.
+	c->proc = 0;
+}
 
 void
 lottery_scheduler(void){
@@ -346,16 +358,7 @@ lottery_scheduler(void){
             continue;
         sum_of_tickets += p->ticket_number;
         if (sum_of_tickets >= t){
-            c->proc = p;
-            switchuvm(p);
-            p->state = RUNNING;
-
-            swtch(&(c->scheduler), p->context);
-            switchkvm();
-
-            // Process is done running for now.
-            // It should have changed its p->state before coming back.
-            c->proc = 0;
+            switch_context(c, p);
         }
 
     }
@@ -385,15 +388,7 @@ priority_scheduler() {
         // Switch to chosen process.	It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
-        c->proc = p;
-        switchuvm(p);
-        p->state = RUNNING;
-        swtch(&(c->scheduler), p->context);
-        switchkvm();
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+        switch_context(c, p);
     }
 }
 
@@ -407,12 +402,7 @@ fcfs_scheduler()
 	if (!fcfs_is_empty()) {
 	// if (1) {
 		p = get_from_fcfs_sched();
-		c->proc = p;
-		switchuvm(p);
-		p->state = RUNNING;
-		swtch(&(c->scheduler), p->context);
-		switchkvm();
-		c->proc = 0;
+		switch_context(c, p);
 
 	} else {
 		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -424,16 +414,7 @@ fcfs_scheduler()
 			// Switch to chosen process.	It is the process's job
 			// to release ptable.lock and then reacquire it
 			// before jumping back to us.
-			c->proc = p;
-			switchuvm(p);
-			p->state = RUNNING;
-
-			swtch(&(c->scheduler), p->context);
-			switchkvm();
-
-			// Process is done running for now.
-			// It should have changed its p->state before coming back.
-			c->proc = 0;
+			switch_context(c, p);
 		}
 	}
 }
