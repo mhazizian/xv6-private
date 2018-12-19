@@ -7,8 +7,6 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "fcfssched.h"
-
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -27,7 +25,6 @@ static void wakeup1(void *chan);
 void
 add_to_runnable_queue(struct proc* p) {
 	p->state = RUNNABLE;
-	add_to_fcfs_sched(p);
 }
 
 void
@@ -106,7 +103,6 @@ found:
 	// @TODO First process
 	p->time = sys_uptime();
 	p->ticket = 10;
-	p->sched_queue = FCFS;
 
 	release(&ptable.lock);
 
@@ -640,7 +636,6 @@ void
 pstat(void)
 {
 	struct proc* p;
-	init_sched_queue();
 	acquire(&ptable.lock);
 
 	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");

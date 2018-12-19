@@ -127,12 +127,6 @@ void                        puttolot(int, int);
 // swtch.S
 void						swtch(struct context**, struct context*);
 
-//fcfs_sched.c
-void                        add_to_fcfs_sched(struct proc*);
-struct proc*                get_from_fcfs_sched(void);
-int                         fcfs_is_empty(void);
-void                        init_sched_queue(void);
-
 // spinlock.c
 void						acquire(struct spinlock*);
 void						getcallerpcs(void*, uint*);
