@@ -101,6 +101,7 @@ found:
 	// @TODO set priority:
 	p->priority = ticks % 9 + 1;
 	p->time = ticks;
+	p->ticket = 10;
 
 	release(&ptable.lock);
 
@@ -345,9 +346,9 @@ lottery_scheduler(void){
     long sum_of_tickets = 0;
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
+        if(p->state != RUNNABLE || p->ticket == 0)
             continue;
-        sum_of_tickets += p->ticket_number;
+        sum_of_tickets += p->ticket;
     }
 
     long t;
@@ -356,12 +357,11 @@ lottery_scheduler(void){
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state != RUNNABLE)
             continue;
-        sum_of_tickets += p->ticket_number;
+        sum_of_tickets += p->ticket;
         if (sum_of_tickets >= t){
             switch_context(c, p);
         }
     }
-
 }
 
 void
