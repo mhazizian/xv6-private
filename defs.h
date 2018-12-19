@@ -122,7 +122,7 @@ int						 wait(void);
 void						wakeup(void*);
 void						yield(void);
 void                        pstat(void);
-void                        puttolot(int, int);
+void                        setticket(int, int);
 void                        changequeue(int, int);
 
 // swtch.S

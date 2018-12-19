@@ -99,9 +99,10 @@ found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
 	// @TODO set priority:
-	p->priority = ticks % 9 + 1;
 	p->time = sys_uptime();
-	p->ticket = 10;
+	p->queue = FCFS;
+	p->priority = 0;
+	p->ticket = 0;
 
 	release(&ptable.lock);
 
@@ -325,7 +326,8 @@ wait(void)
 	}
 }
 
-void switch_context(struct cpu *c, struct proc *p){
+void
+context_switch(struct cpu *c, struct proc *p){
 	c->proc = p;
 	switchuvm(p);
 	p->state = RUNNING;
@@ -346,7 +348,7 @@ lottery_scheduler(void){
     long sum_of_tickets = 0;
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE || p->ticket == 0)
+        if(p->state != RUNNABLE || p->queue != LOTTERY)
             continue;
         sum_of_tickets += p->ticket;
     }
@@ -354,13 +356,13 @@ lottery_scheduler(void){
     long t;
     t = random_at_most(sum_of_tickets);
     sum_of_tickets = 0;
+
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
+        if(p->state != RUNNABLE || p->queue != LOTTERY)
             continue;
         sum_of_tickets += p->ticket;
-        if (sum_of_tickets >= t){
-            switch_context(c, p);
-        }
+        if (sum_of_tickets >= t)
+            context_switch(c, p);
     }
 }
 
@@ -373,7 +375,7 @@ priority_scheduler() {
 	c->proc = 0;
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++, i++){
-		if(p->state != RUNNABLE)
+		if(p->state != RUNNABLE || p->queue != PRIORITY)
 			continue;
 
         if (max < p->priority) {
@@ -382,10 +384,8 @@ priority_scheduler() {
         }
 	}
 
-    if (max_index != -1) {    
-        p = &ptable.proc[max_index];
-        switch_context(c, p);
-    }
+    if (max_index != -1)
+        context_switch(c, &ptable.proc[max_index]);
 }
 
 void
@@ -393,24 +393,23 @@ fcfs_scheduler()
 {
 	struct proc *p;
 	struct cpu *c = mycpu();
-    int min = nextpid + 1, min_index = -1;
-    int i = 0;
+    int min = nextpid + 1; // Maximum PID
+    int i = 0, min_index = -1;
 	c->proc = 0;
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++, i++){
-		if(p->state != RUNNABLE)
+		if(p->state != RUNNABLE || p->queue != FCFS)
 			continue;
 
+		// Find the minimum number of PID which is the first-come process
         if (min > p->pid) {
             min = p->pid;
             min_index = i;
         }
 	}
 
-    if (min_index != -1) {    
-        p = &ptable.proc[min_index];
-        switch_context(c, p);
-    }
+    if (min_index != -1)
+        context_switch(c, &ptable.proc[min_index]);
 }
 
 //PAGEBREAK: 42
@@ -648,21 +647,26 @@ pstat(void)
 }
 
 void
-puttolot(int pid, int ticket)
+setticket(int pid, int ticket)
 {
 	struct proc *p;
 
 	acquire(&ptable.lock);
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
 		if (p->pid == pid) {
-			p->sched_queue = LOTTERY;
-			p->ticket = ticket;
+			if (p->queue == LOTTERY) {
+				p->ticket = ticket;
+				return;
+			} else {
+				panic("This process is not in the Lottery Queue!\n");
+			}
 		}
 	}
+	panic("Didn't find the requested process!");
 }
 
 
-void changequeue(int pid, int sched_queue)
+void changequeue(int pid, int queue)
 {
 	struct proc *p;
 
@@ -670,7 +674,7 @@ void changequeue(int pid, int sched_queue)
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
 		if(p->pid == pid) {
-			p->sched_queue = sched_queue;
+			p->queue = queue;
 			break;	
 		}
 

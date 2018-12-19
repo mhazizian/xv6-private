@@ -21,5 +21,5 @@
 #define SYS_mkdir	20
 #define SYS_close	21
 #define SYS_pstat	22
-#define SYS_puttolot 23
+#define SYS_setticket 23
 #define SYS_changequeue 24

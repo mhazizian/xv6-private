@@ -98,7 +98,7 @@ sys_pstat(void)
 }
 
 int
-sys_puttolot(void)
+sys_setticket(void)
 {
 	int pid, ticket;
 
@@ -108,21 +108,21 @@ sys_puttolot(void)
 	if(argint(1,  &ticket) < 0)
 		return -1;
 
-	puttolot(pid, ticket);
+	setticket(pid, ticket);
 	return 0;
 }
 
 
 int sys_changequeue()
 {
-	int pid, sched_queue;
+	int pid, queue;
 
 	if(argint(0, &pid) < 0)
 		return -1;
 
-	if(argint(1,  &sched_queue) < 0)
+	if(argint(1,  &queue) < 0)
 		return -1;
 
-	changequeue(pid, sched_queue);
+	changequeue(pid, queue);
 	return 0;
 }
