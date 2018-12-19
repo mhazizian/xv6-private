@@ -75,6 +75,9 @@ myproc(void) {
 	return p;
 }
 
+
+extern int sys_uptime();
+
 //PAGEBREAK: 32
 // Look in the process table for an UNUSED proc.
 // If found, change state to EMBRYO and initialize
@@ -100,7 +103,8 @@ found:
 	p->pid = nextpid++;
 	// @TODO set priority:
 	p->priority = ticks % 9 + 1;
-	p->time = ticks;
+	// @TODO First process
+	p->time = sys_uptime();
 	p->ticket = 10;
 
 	release(&ptable.lock);
@@ -396,26 +400,27 @@ fcfs_scheduler()
 {
 	struct proc *p;
 	struct cpu *c = mycpu();
+    int min = nextpid + 1, min_index = -1;
+    int i = 0;
 	c->proc = 0;
 
-	if (!fcfs_is_empty()) {
-	// if (1) {
-		p = get_from_fcfs_sched();
-		switch_context(c, p);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++, i++){
+		if(p->state != RUNNABLE)
+			continue;
 
-	} else {
-		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-			if(p->state != RUNNABLE)
-				continue;
-
-			cprintf("# fcfs was empty\n");
-
-			// Switch to chosen process.	It is the process's job
-			// to release ptable.lock and then reacquire it
-			// before jumping back to us.
-			switch_context(c, p);
-		}
+        if (min > p->pid) {
+            min = p->pid;
+            min_index = i;
+        }
 	}
+
+    if (min_index != -1) {    
+        p = &ptable.proc[min_index];
+        // Switch to chosen process.	It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        switch_context(c, p);
+    }
 }
 
 //PAGEBREAK: 42
