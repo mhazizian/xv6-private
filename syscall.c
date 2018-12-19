@@ -105,6 +105,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_pstat(void);
 extern int sys_puttolot(void);
+extern int sys_changequeue(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]		sys_fork,
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]	 sys_close,
 [SYS_pstat]	 sys_pstat,
 [SYS_puttolot] sys_puttolot,
+[SYS_changequeue] sys_changequeue,
 };
 
 void

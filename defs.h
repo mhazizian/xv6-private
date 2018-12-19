@@ -123,9 +123,11 @@ void						wakeup(void*);
 void						yield(void);
 void                        pstat(void);
 void                        puttolot(int, int);
+void                        changequeue(int, int);
 
 // swtch.S
 void						swtch(struct context**, struct context*);
+
 
 // spinlock.c
 void						acquire(struct spinlock*);

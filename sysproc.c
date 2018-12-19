@@ -111,3 +111,18 @@ sys_puttolot(void)
 	puttolot(pid, ticket);
 	return 0;
 }
+
+
+int sys_changequeue()
+{
+	int pid, sched_queue;
+
+	if(argint(0, &pid) < 0)
+		return -1;
+
+	if(argint(1,  &sched_queue) < 0)
+		return -1;
+
+	changequeue(pid, sched_queue);
+	return 0;
+}

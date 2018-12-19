@@ -100,7 +100,6 @@ found:
 	p->pid = nextpid++;
 	// @TODO set priority:
 	p->priority = ticks % 9 + 1;
-	// @TODO First process
 	p->time = sys_uptime();
 	p->ticket = 10;
 
@@ -385,9 +384,6 @@ priority_scheduler() {
 
     if (max_index != -1) {    
         p = &ptable.proc[max_index];
-        // Switch to chosen process.	It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
         switch_context(c, p);
     }
 }
@@ -413,9 +409,6 @@ fcfs_scheduler()
 
     if (min_index != -1) {    
         p = &ptable.proc[min_index];
-        // Switch to chosen process.	It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
         switch_context(c, p);
     }
 }
@@ -666,4 +659,20 @@ puttolot(int pid, int ticket)
 			p->ticket = ticket;
 		}
 	}
+}
+
+
+void changequeue(int pid, int sched_queue)
+{
+	struct proc *p;
+
+	acquire(&ptable.lock);
+
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+		if(p->pid == pid) {
+			p->sched_queue = sched_queue;
+			break;	
+		}
+
+	release(&ptable.lock);
 }
