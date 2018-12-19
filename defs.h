@@ -122,6 +122,7 @@ int						 wait(void);
 void						wakeup(void*);
 void						yield(void);
 void                        pstat(void);
+void                        puttolot(int, int);
 
 // swtch.S
 void						swtch(struct context**, struct context*);

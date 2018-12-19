@@ -96,3 +96,18 @@ sys_pstat(void)
 	pstat();
 	return 0;
 }
+
+int
+sys_puttolot(void)
+{
+	int pid, ticket;
+
+	if(argint(0, &pid) < 0)
+		return -1;
+
+	if(argint(1,  &ticket) < 0)
+		return -1;
+
+	puttolot(pid, ticket);
+	return 0;
+}

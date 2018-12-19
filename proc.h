@@ -36,7 +36,7 @@ struct context {
 };
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
-
+enum procqueue { FCFS, PRIORITY, LOTTERY };
 // Per-process state
 struct proc {
 	uint sz;										 // Size of process memory (bytes)
@@ -52,6 +52,7 @@ struct proc {
 	struct file *ofile[NOFILE];	// Open files
 	struct inode *cwd;					 // Current directory
 	char name[16];							 // Process name (debugging)
+	enum procqueue sched_queue;
 	int time;
 	int priority;
 	int ticket;
@@ -64,7 +65,7 @@ struct proc {
 //	 expandable heap
 
 
-// struct proc_queue
+// struct procqueue
 // {
 // 	struct proc* procs[NPROC];
 // 	// struct spinlock lock;

@@ -106,6 +106,7 @@ found:
 	// @TODO First process
 	p->time = sys_uptime();
 	p->ticket = 10;
+	p->sched_queue = FCFS;
 
 	release(&ptable.lock);
 
@@ -656,4 +657,18 @@ pstat(void)
 	cprintf("######################################################\n");
 
 	release(&ptable.lock);
+}
+
+void
+puttolot(int pid, int ticket)
+{
+	struct proc *p;
+
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+		if (p->pid == pid) {
+			p->sched_queue = LOTTERY;
+			p->ticket = ticket;
+		}
+	}
 }
