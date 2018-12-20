@@ -112,7 +112,6 @@ sys_setticket(void)
 	return 0;
 }
 
-
 int sys_changequeue()
 {
 	int pid, queue;
@@ -124,5 +123,26 @@ int sys_changequeue()
 		return -1;
 
 	changequeue(pid, queue);
+	return 0;
+}
+
+int
+sys_whichqueue() {
+	whichqueue();
+	return 0;
+}
+
+
+int sys_setpriority()
+{
+	int pid, priority;
+
+	if(argint(0, &pid) < 0)
+		return -1;
+
+	if(argint(1,  &priority) < 0)
+		return -1;
+
+	setpriority(pid, priority);
 	return 0;
 }

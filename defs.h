@@ -124,6 +124,8 @@ void						yield(void);
 void                        pstat(void);
 void                        setticket(int, int);
 void                        changequeue(int, int);
+void                        whichqueue();
+void                        setpriority(int, int);
 
 // swtch.S
 void						swtch(struct context**, struct context*);

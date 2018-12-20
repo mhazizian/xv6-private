@@ -106,6 +106,8 @@ extern int sys_uptime(void);
 extern int sys_pstat(void);
 extern int sys_setticket(void);
 extern int sys_changequeue(void);
+extern int sys_whichqueue(void);
+extern int sys_setpriority(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]		sys_fork,
@@ -132,6 +134,8 @@ static int (*syscalls[])(void) = {
 [SYS_pstat]	 sys_pstat,
 [SYS_setticket] sys_setticket,
 [SYS_changequeue] sys_changequeue,
+[SYS_whichqueue] sys_whichqueue,
+[SYS_setpriority] sys_setpriority,
 };
 
 void

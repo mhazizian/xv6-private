@@ -98,8 +98,9 @@ allocproc(void)
 found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
-	// @TODO set priority:
-	p->time = sys_uptime();
+	// Something is wrong with sys_uptime() : Deadlock occured in multi-cpu system
+	// p->time = sys_uptime();
+	p->time = ticks;
 	p->queue = FCFS;
 	p->priority = 0;
 	p->ticket = 0;
@@ -423,9 +424,6 @@ fcfs_scheduler()
 void
 scheduler(void)
 {
-	// struct proc *p;
-	// struct cpu *c = mycpu();
-	// c->proc = 0;
 	for(;;){
 		// Enable interrupts on this processor.
 		sti();
@@ -679,4 +677,38 @@ void changequeue(int pid, int queue)
 		}
 
 	release(&ptable.lock);
+}
+
+void
+whichqueue() {
+	struct proc* p;
+	acquire(&ptable.lock);
+
+	cprintf("name\tpid\tqueue\n");
+
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		if (p->state == UNUSED)
+			continue;
+		cprintf("%s\t%d\t%d\n", p->name, p->pid, p->queue);
+	}
+
+	release(&ptable.lock);
+}
+
+void setpriority(int pid, int priority)
+{
+	struct proc *p;
+
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+		if (p->pid == pid) {
+			if (p->queue == PRIORITY) {
+				p->priority = priority;
+				return;
+			} else {
+				panic("This process is not in the Priority Queue!\n");
+			}
+		}
+	}
+	panic("Didn't find the requested process!");
 }

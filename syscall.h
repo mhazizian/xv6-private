@@ -23,3 +23,5 @@
 #define SYS_pstat	22
 #define SYS_setticket 23
 #define SYS_changequeue 24
+#define SYS_whichqueue 25
+#define SYS_setpriority 26
