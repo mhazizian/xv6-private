@@ -13,7 +13,7 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
-char* proc_state_caption[6] = { "UNUSED__", "EMBRYO__", "SLEEPING", "RUNNABLE", "RUNNING_", "ZOMBIE__" };
+char* proc_state_caption[6] = { "UNUSED  ", "EMBRYO  ", "SLEEPING", "RUNNABLE", "RUNNING ", "ZOMBIE " };
 
 static struct proc *initproc;
 
