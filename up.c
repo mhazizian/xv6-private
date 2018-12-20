@@ -1,7 +1,7 @@
 #include "types.h"
 #include "user.h"
 
-#define NCHILD 10
+#define NCHILD 4
 
 int main(int argc, char *argv[])
 {
@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
 	int pid, i;
 	pid = fork();
 	for (i = 0; i < NCHILD; ++i)
-		if (pid > 0)
-			pid = fork();
+		// if (pid > 0)
+		pid = fork();
 
 	if (pid < 0)
 	{
@@ -18,13 +18,13 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
-		whichqueue();
+		// whichqueue();
 	}
 	else
 	{
 		for (int i = 0; i < NCHILD + 1; ++i)
 			wait();
-		changequeue(1, 2);
+		// changequeue(1, 2);
 	}
 
 	exit();

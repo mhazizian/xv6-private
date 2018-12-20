@@ -350,6 +350,7 @@ lottery_scheduler(void){
     struct cpu *c = mycpu();
     c->proc = 0;
     long sum_of_tickets = 0;
+	// int i = 0;
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state != RUNNABLE || p->queue != LOTTERY)
@@ -365,8 +366,13 @@ lottery_scheduler(void){
         if(p->state != RUNNABLE || p->queue != LOTTERY)
             continue;
         sum_of_tickets += p->ticket;
-        if (sum_of_tickets >= t)
+		// cprintf("i:%d\n", i);
+		// i++;
+        if (sum_of_tickets >= t) {
             context_switch(c, p);
+			// cprintf("@\n");
+			break;
+		}
     }
 }
 
