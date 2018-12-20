@@ -36,7 +36,8 @@ struct context {
 };
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
-enum procqueue { FCFS = 1, PRIORITY = 2, LOTTERY = 3 };
+enum procqueue {  LOTTERY = 1, FCFS  = 2, PRIORITY = 3 };
+
 // Per-process state
 struct proc {
 	uint sz;										 // Size of process memory (bytes)

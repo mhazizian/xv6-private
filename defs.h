@@ -201,3 +201,6 @@ long random_at_most(long);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+
+#define TRUE 1
+#define FALSE 0

@@ -133,8 +133,8 @@ sys_whichqueue() {
 }
 
 
-int sys_setpriority()
-{
+int
+sys_setpriority() {
 	int pid, priority;
 
 	if(argint(0, &pid) < 0)

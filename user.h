@@ -25,6 +25,9 @@ int sleep(int);
 int uptime(void);
 void pstat(void);
 void changequeue(int, int);
+void setticket(int, int);
+void whichqueue();
+void setpriority(int, int);
 
 // ulib.c
 int stat(const char*, struct stat*);

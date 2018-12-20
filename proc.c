@@ -7,6 +7,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+
 struct {
 	struct spinlock lock;
 	struct proc proc[NPROC];
@@ -98,10 +99,12 @@ allocproc(void)
 found:
 	p->state = EMBRYO;
 	p->pid = nextpid++;
-	// Something is wrong with sys_uptime() : Deadlock occured in multi-cpu system
+	/// @todo issue: Same time for different processes
+	// Something is wrong with sys_uptime() : Deadlock occured in the multi-cpu system
 	// p->time = sys_uptime();
 	p->time = ticks;
-	p->queue = FCFS;
+	p->queue = LOTTERY;
+	// p->queue = FCFS;
 	p->priority = 0;
 	p->ticket = 0;
 
@@ -384,7 +387,6 @@ priority_scheduler() {
             max_index = i;
         }
 	}
-
     if (max_index != -1)
         context_switch(c, &ptable.proc[max_index]);
 }
@@ -408,9 +410,19 @@ fcfs_scheduler()
             min_index = i;
         }
 	}
-
     if (min_index != -1)
         context_switch(c, &ptable.proc[min_index]);
+}
+
+int
+is_queue_empty(int queue)
+{
+	struct proc *p;
+
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+		if(p->state == RUNNABLE && p->queue == queue)
+			return FALSE;
+	return TRUE;
 }
 
 //PAGEBREAK: 42
@@ -431,9 +443,15 @@ scheduler(void)
 		// Loop over process table looking for process to run.
 		acquire(&ptable.lock);
 
-		fcfs_scheduler();
 		// for priority Sched:
 		// priority_scheduler();
+		if (!is_queue_empty(LOTTERY))
+			lottery_scheduler();
+		else if (!is_queue_empty(FCFS))
+			fcfs_scheduler();
+		else if (!is_queue_empty(PRIORITY))
+			fcfs_scheduler();
+
 		release(&ptable.lock);
 	}
 }
@@ -628,6 +646,7 @@ pstat(void)
 	struct proc* p;
 	acquire(&ptable.lock);
 
+	/// @todo Add queue information
 	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");
 	cprintf("_____________________________________________________\n");
 
@@ -684,14 +703,14 @@ whichqueue() {
 	struct proc* p;
 	acquire(&ptable.lock);
 
-	cprintf("name\tpid\tqueue\n");
+	cprintf("###################\nname\tpid\tqueue\n");
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
 			continue;
 		cprintf("%s\t%d\t%d\n", p->name, p->pid, p->queue);
 	}
-
+	
 	release(&ptable.lock);
 }
 

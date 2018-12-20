@@ -18,12 +18,13 @@ int main(int argc, char *argv[])
 	}
 	else if (pid == 0)
 	{
-		pstat();
+		whichqueue();
 	}
 	else
 	{
 		for (int i = 0; i < NCHILD + 1; ++i)
 			wait();
+		changequeue(1, 2);
 	}
 
 	exit();
