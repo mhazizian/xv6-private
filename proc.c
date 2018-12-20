@@ -653,15 +653,15 @@ pstat(void)
 	acquire(&ptable.lock);
 
 	/// @todo Add queue information
-	cprintf("name\tpid\tstate\tpriority\tcreateTime\n");
+	cprintf("name\tpid\tstate\t\tprio\tticket\tqueue\tcreateTime\n");
 	cprintf("_____________________________________________________\n");
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
 			continue;
-		cprintf("%s\t%d\t%s\t%d\t%d\n", p->name, p->pid,
+		cprintf("%s\t%d\t%s\t%d\t%d\t%d\t%d\n", p->name, p->pid,
 			proc_state_caption[p->state], p->priority,
-			p->time
+			p->ticket, p->queue, p->time
 		);
 	}
 	cprintf("######################################################\n");
