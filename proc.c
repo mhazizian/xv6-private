@@ -13,7 +13,7 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
-char* proc_state_caption[6] = { "UNUSED  ", "EMBRYO  ", "SLEEPING", "RUNNABLE", "RUNNING ", "ZOMBIE " };
+char* proc_state_caption[6] = { "UNUSED__", "EMBRYO__", "SLEEPING", "RUNNABLE", "RUNNING_", "ZOMBIE__" };
 
 static struct proc *initproc;
 
@@ -106,7 +106,7 @@ found:
 	p->queue = LOTTERY;
 	// p->queue = FCFS;
 	p->priority = 0;
-	p->ticket = 0;
+	p->ticket = 10;
 
 	release(&ptable.lock);
 
@@ -654,7 +654,7 @@ pstat(void)
 
 	/// @todo Add queue information
 	cprintf("name\tpid\tstate\t\tprio\tticket\tqueue\tcreateTime\n");
-	cprintf("_____________________________________________________\n");
+	cprintf("______________________________________________________________\n");
 
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if (p->state == UNUSED)
@@ -664,7 +664,7 @@ pstat(void)
 			p->ticket, p->queue, p->time
 		);
 	}
-	cprintf("######################################################\n");
+	cprintf("###############################################################\n\n");
 
 	release(&ptable.lock);
 }
