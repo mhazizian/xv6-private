@@ -106,7 +106,7 @@ found:
 	p->queue = LOTTERY;
 	// p->queue = FCFS;
 	p->priority = 0;
-	p->ticket = 10;
+	p->ticket = MAX_TICKET_COUNT;
 
 	release(&ptable.lock);
 

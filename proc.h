@@ -1,6 +1,9 @@
 #include "param.h"
 #include "date.h"
 
+#define HIGHEST_TICKET_COUNT 200
+#define MAX_TICKET_COUNT 10
+
 // Per-CPU state
 struct cpu {
 	uchar apicid;								// Local APIC ID
