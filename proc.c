@@ -451,13 +451,22 @@ scheduler(void)
 
 		// for priority Sched:
 		// priority_scheduler();
-		if (!is_queue_empty(LOTTERY))
+		if (!is_queue_empty(LOTTERY)) {
 			lottery_scheduler();
-		else if (!is_queue_empty(FCFS))
+			release(&ptable.lock);
+			continue;
+		}
+		else if (!is_queue_empty(FCFS)) {
 			fcfs_scheduler();
-		else if (!is_queue_empty(PRIORITY))
+			release(&ptable.lock);
+			continue;
+		}
+		else if (!is_queue_empty(PRIORITY)) {
 			priority_scheduler();
-
+			release(&ptable.lock);
+			continue;
+		}
+		
 		release(&ptable.lock);
 	}
 }
