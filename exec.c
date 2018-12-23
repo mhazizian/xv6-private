@@ -7,6 +7,8 @@
 #include "x86.h"
 #include "elf.h"
 
+// extern struct page_table ptable;
+
 int
 exec(char *path, char **argv)
 {
@@ -100,6 +102,10 @@ exec(char *path, char **argv)
 	curproc->tf->eip = elf.entry;	// main
 	curproc->tf->esp = sp;
 	curproc->time = ticks;
+	if (curproc->parent->pid == 2) {
+		curproc->queue = LOTTERY;
+		curproc->ticket = HIGHEST_TICKET_COUNT;
+	}
 	
 	// @TODO : set priority
 	switchuvm(curproc);
