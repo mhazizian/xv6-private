@@ -456,7 +456,7 @@ scheduler(void)
 		else if (!is_queue_empty(FCFS))
 			fcfs_scheduler();
 		else if (!is_queue_empty(PRIORITY))
-			fcfs_scheduler();
+			priority_scheduler();
 
 		release(&ptable.lock);
 	}
