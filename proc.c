@@ -21,6 +21,73 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+
+char system_call_name[SYS_CALL_NUMBERS][MAX_SYSTEM_CALL_NAME_SIZE] = {
+        "empty",
+        "fork",
+        "exit",
+        "wait",
+        "pipe",
+        "read",
+        "kill",
+        "exec",
+        "fstat",
+        "chdir",
+        "dup",
+        "getpid",
+        "sbrk",
+        "sleep",
+        "uptime",
+        "open",
+        "write",
+        "mknod",
+        "unlink",
+        "link",
+        "mkdir",
+        "close",
+        "invoked_syscalls",
+        "log_syscalls",
+        "sort_syscalls",
+        "get_count",
+        "inc_num",
+};
+
+void
+print_arguments(struct system_call_status* system_call)
+{
+    struct argument arg;
+    int j;
+    for (j = 0; j < system_call->number_of_arguments; j++) {
+	arg = system_call->arguments[j];
+	switch (arg.type) {
+	    case VOID:
+		return;
+	    case INT:
+		cprintf("    |__ int: %d\n", arg.int_value);
+		break;
+	    case CHARP:
+		cprintf("    |__ char*: %s\n", arg.charp_value);
+		break;
+	    case POINTER:
+		cprintf("    |__ *: %p\n", arg.p_value);
+		break;
+	    default:
+		    break;
+	}
+    }
+}
+
+void
+print_system_call_status(struct system_call_status* system_call)
+{
+        cprintf("\nSystem Call ID: %d , System Call Name: %s , "
+	        "Call Time: %d:%d:%d\n", system_call->syscall_number,
+	        system_call_name[system_call->syscall_number],
+	        system_call->time.hour, system_call->time.minute,
+	        system_call->time.second);
+	print_arguments(system_call);
+}
+
 void
 pinit(void)
 {
@@ -524,11 +591,12 @@ procdump(void)
 			state = states[p->state];
 		else
 			state = "???";
-		cprintf("%d %s %s", p->pid, state, p->name);
+		cprintf("%d %s %s count: %d", p->pid, state, p->name, process_system_calls[p->pid].number_of_calls);
 		if(p->state == SLEEPING){
 			getcallerpcs((uint*)p->context->ebp+2, pc);
 			for(i=0; i<10 && pc[i] != 0; i++)
 				cprintf(" %p", pc[i]);
+
 		}
 		cprintf("\n");
 	}

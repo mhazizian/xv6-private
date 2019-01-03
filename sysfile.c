@@ -21,25 +21,72 @@ extern void set_void_argument(int argument_number, int system_call_number);
 extern void set_int_argument(int value, int argument_number,
         int system_call_number);
 
-void set_charp_argument(char* value, int argument_number, int system_call_number)
+
+void
+config_new_syscall_status(struct system_call_status* new_element,
+        int syscall_id, int pid)
+{
+    // Add new syscall struct to the end of sorted_syscalls by time
+    sorted_syscalls.items[sorted_syscalls.number_of_calls] = new_element;
+
+    new_element->index_in_sorted_syscalls_by_time =
+            sorted_syscalls.number_of_calls;
+    new_element->syscall_number = syscall_id;
+    new_element->pid = pid;
+
+    sorted_syscalls.number_of_calls++;
+    sorted_syscalls.number_of_calls %= NPROC * MAX_SYS_CALL_NUMBERS;
+}
+
+void
+initialize_new_syscall_status(int pid, int syscall_id)
+{
+    struct system_call_status* system_call_status_struct =
+            process_system_calls[pid].system_calls;
+    int number_of_calls = process_system_calls[pid].number_of_calls;
+
+    struct system_call_status* last_element =
+            &system_call_status_struct[number_of_calls];
+    config_new_syscall_status(last_element, syscall_id, pid);
+}
+
+void
+set_pointer_argument(uint value, int argument_number, int system_call_number)
 {
     struct proc* curproc = myproc();
-    int kill_pid = curproc->pid;
-    int i;
+    int pid = curproc->pid;
 
-    struct system_call* system_call_struct = &process_system_calls[kill_pid][system_call_number];
+    struct system_call* system_call_struct = &process_system_calls[pid];
     int number_of_calls = (*system_call_struct).number_of_calls;
 
+    (*system_call_struct).system_calls[number_of_calls].number_of_arguments++;
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].type = POINTER;
+
+    (*system_call_struct).system_calls[number_of_calls].
+            arguments[argument_number].p_value = value;
+}
+
+void
+set_charp_argument(char* value, int argument_number, int system_call_number)
+{
+    struct proc* curproc = myproc();
+    int pid = curproc->pid;
+    int i;
+
+    struct system_call* system_call_struct = &process_system_calls[pid];
+    int number_of_calls = (*system_call_struct).number_of_calls;
+
+    (*system_call_struct).system_calls[number_of_calls].number_of_arguments++;
     (*system_call_struct).system_calls[number_of_calls].
             arguments[argument_number].type = CHARP;
 
-
     for (i = 0; i < MAX_CHARP_SIZE; ++i)
     {
-	if (value[i] == '\0')
-	    break;
-	(*system_call_struct).system_calls[number_of_calls].
-	        arguments[argument_number].charp_value[i] = value[i];
+		(*system_call_struct).system_calls[number_of_calls].
+				arguments[argument_number].charp_value[i] = value[i];
+		if (value[i] == '\0')
+			break;
     }
 }
 
@@ -89,6 +136,8 @@ sys_dup(void)
 		return -1;
 	if((fd=fdalloc(f)) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_dup);
 	filedup(f);
 	return fd;
 }
@@ -102,6 +151,11 @@ sys_read(void)
 
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_write);
+	set_charp_argument(p, SECOND, SYS_write);
+	set_int_argument(n, THIRD, SYS_write);
+
 	return fileread(f, p, n);
 }
 
@@ -114,6 +168,11 @@ sys_write(void)
 
 	if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_write);
+	set_charp_argument(p, SECOND, SYS_write);
+	set_int_argument(n, THIRD, SYS_write);
+
 	return filewrite(f, p, n);
 }
 
@@ -124,8 +183,10 @@ sys_close(void)
 	struct file *f;
 
 	if(argfd(0, &fd, &f) < 0)
-		return -1;
+	        return -1;
 	myproc()->ofile[fd] = 0;
+
+	set_pointer_argument((uint)f, FIRST, SYS_close);
 	fileclose(f);
 	return 0;
 }
@@ -138,6 +199,9 @@ sys_fstat(void)
 
 	if(argfd(0, 0, &f) < 0 || argptr(1, (void*)&st, sizeof(*st)) < 0)
 		return -1;
+
+	set_pointer_argument((uint)f, FIRST, SYS_fstat);
+	set_pointer_argument((uint)st, SECOND, SYS_fstat);
 	return filestat(f, st);
 }
 
@@ -150,6 +214,9 @@ sys_link(void)
 
 	if(argstr(0, &old) < 0 || argstr(1, &new) < 0)
 		return -1;
+
+	set_charp_argument(old, FIRST, SYS_link);
+	set_charp_argument(new, SECOND, SYS_link);
 
 	begin_op();
 	if((ip = namei(old)) == 0){
@@ -218,6 +285,8 @@ sys_unlink(void)
 
 	if(argstr(0, &path) < 0)
 		return -1;
+
+	set_charp_argument(path, FIRST, SYS_unlink);
 
 	begin_op();
 	if((dp = nameiparent(path, name)) == 0){
@@ -458,7 +527,7 @@ sys_exec(void)
 	}
 
 	set_charp_argument(path, FIRST, SYS_exec);
-	// @TODO add char**
+	set_pointer_argument((uint)argv, SECOND, SYS_exec);
 	return exec(path, argv);
 }
 
@@ -471,6 +540,9 @@ sys_pipe(void)
 
 	if(argptr(0, (void*)&fd, 2*sizeof(fd[0])) < 0)
 		return -1;
+
+	set_pointer_argument((uint)fd, FIRST, SYS_pipe);
+
 	if(pipealloc(&rf, &wf) < 0)
 		return -1;
 	fd0 = -1;
