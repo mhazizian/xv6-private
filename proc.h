@@ -71,7 +71,7 @@ struct context {
 };
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
-
+// This struct is for kernel not process!!!!
 // Per-process state
 struct proc {
 	int last_system_call;
