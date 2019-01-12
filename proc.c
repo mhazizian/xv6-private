@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "syscall.h"
+#include "sharedm.h"
+
 
 struct {
 	struct spinlock lock;
@@ -574,18 +576,4 @@ int invoked_syscalls(int pid)
     cprintf("Process not found!\n");
     release(&ptable.lock);
     return 3;
-}
-
-
-int shm_open(int id, int page_count, int flag)
-{
-
-}
-void * shm_attach(int id)
-{
-
-}
-int shm_close(int id)
-{
-
 }

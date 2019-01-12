@@ -7,7 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "syscall.h"
-#include "sharedm.h"
+//#include "sharedm.h"
 
 void
 set_int_argument(int value, int argument_number, int system_call_number)
@@ -145,7 +145,7 @@ sys_invoked_syscalls(void)
 int sys_shm_open(void)
 {
 	int id, page_count;
-    enum shm_flag flag;
+    int  flag;
 
 	if(argint(0, &id) < 0)
 		return -1;
