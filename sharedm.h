@@ -10,7 +10,7 @@ struct shm {
     enum shm_flag flags;
     uint ref_count;
     uint size;
-    uint shared_page_physical_addresses[10];
+    char* shared_page_physical_addresses[15];
 };
 
 struct shm shm_table[100];
