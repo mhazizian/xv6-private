@@ -121,6 +121,10 @@ int						 wait(void);
 void						wakeup(void*);
 void						yield(void);
 int						invoked_syscalls(int);
+int                     shm_open(int, int , int );
+void *                   shm_attach(int);
+int                        shm_close(int);
+
 
 // swtch.S
 void						swtch(struct context**, struct context*);

@@ -21,3 +21,6 @@
 #define SYS_mkdir	20
 #define SYS_close	21
 #define SYS_invoked_syscalls	22
+#define SYS_shm_open            23
+#define SYS_shm_attach          24
+#define SYS_shm_close           25

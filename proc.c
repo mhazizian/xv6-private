@@ -575,3 +575,17 @@ int invoked_syscalls(int pid)
     release(&ptable.lock);
     return 3;
 }
+
+
+int shm_open(int id, int page_count, int flag)
+{
+
+}
+void * shm_attach(int id)
+{
+
+}
+int shm_close(int id)
+{
+
+}

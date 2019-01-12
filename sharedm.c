@@ -4,23 +4,25 @@
 //size field in proc struct first assign then increament
 //
 
+//
+//#include "param.h"
+//#include "types.h"
+//#include "defs.h"
+//#include "x86.h"
+//#include "memlayout.h"
+//#include "mmu.h"
+//#include "proc.h"
+//#include "elf.h"
 
-#include "param.h"
-#include "types.h"
-#include "defs.h"
-#include "x86.h"
-#include "memlayout.h"
-#include "mmu.h"
-#include "proc.h"
-#include "elf.h"
 
-struct shm {
-    uint id;
-    uint owner_process;
-    uint flags;
-    uint ref_count;
-    uint size;
-    enum { ONLY_OWNER_WRITE, ONLY_CHILD_CAN_ATTACH } shared_page_physical_addresses;
-};
-
-struct shm shm_table[100];
+//
+//int mahammad_call() {
+//    struct proc *cur_proc;
+//    struct cpu *c;
+//    c = mycpu();
+//    cur_proc = c->proc;
+//
+////    cur_proc->
+//    int physical_address = kalloc();
+//    return 3;
+//}

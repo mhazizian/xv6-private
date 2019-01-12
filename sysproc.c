@@ -7,6 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "syscall.h"
+#include "sharedm.h"
 
 void
 set_int_argument(int value, int argument_number, int system_call_number)
@@ -53,7 +54,7 @@ int
 sys_wait(void)
 {
         set_void_argument(FIRST, SYS_wait);
-	return wait();
+		return wait();
 }
 
 
@@ -140,3 +141,41 @@ sys_invoked_syscalls(void)
     return invoked_syscalls(pid);
 }
 
+
+int sys_shm_open(void)
+{
+	int id, page_count;
+    enum shm_flag flag;
+
+	if(argint(0, &id) < 0)
+		return -1;
+
+    if(argint(1, &page_count) < 0)
+        return -1;
+
+    if(argint(2, &flag) < 0)
+        return -1;
+
+    shm_open(id, page_count, flag);
+	return 0;
+}
+int sys_shm_attach(void)
+{
+	int id;
+
+	if(argint(0, &id) < 0)
+		return -1;
+
+	shm_attach(id);
+	return 0;
+}
+int sys_shm_close(void)
+{
+	int id;
+
+	if(argint(0, &id) < 0)
+		return -1;
+
+	shm_close(id);
+	return 0;
+}

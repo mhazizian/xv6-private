@@ -30,3 +30,6 @@ SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
 SYSCALL(invoked_syscalls);
+SYSCALL(shm_open);
+SYSCALL(shm_attach);
+SYSCALL(shm_close);

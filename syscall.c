@@ -103,6 +103,10 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_invoked_syscalls(void);
+extern int sys_shm_open(void);
+extern int sys_shm_attach(void);
+extern int sys_shm_close(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]		sys_fork,
@@ -127,6 +131,10 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]	 sys_mkdir,
 [SYS_close]	 sys_close,
 [SYS_invoked_syscalls]		sys_invoked_syscalls,
+[SYS_shm_open]		sys_shm_open,
+[SYS_shm_attach]		sys_shm_attach,
+[SYS_shm_close]		sys_shm_close,
+
 };
 
 void
