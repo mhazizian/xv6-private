@@ -192,14 +192,23 @@ inituvm(pde_t *pgdir, char *init, uint sz)
 	memmove(mem, init, sz);
 }
 
-void
+int
+mappagesinsharedmem(pde_t *pgdir, uint start, uint physical_adr)
+{
+	return mappages(pgdir, (char*)start, PGSIZE, physical_adr, PTE_W|PTE_U);;
+}
+
+char*
 initsharedmem(pde_t *pgdir, uint start)
 {
 	char * mem;
 	mem = kalloc();
 	memset(mem, 0, PGSIZE);
-	mappages(pgdir, start, PGSIZE, V2P(mem), PTE_W|PTE_U);
+	mappages(pgdir, (char*)start, PGSIZE, V2P(mem), PTE_W|PTE_U);
+	return V2P(mem);
 }
+
+
 // Load a program segment into pgdir.	addr must be page-aligned
 // and the pages from addr to addr+sz must already be mapped.
 int
