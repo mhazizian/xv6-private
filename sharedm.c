@@ -104,5 +104,4 @@ int shm_close(int id)
         shm_table[row].shared_page_physical_addresses[i] =
                     shm_table[shm_table_size].shared_page_physical_addresses[i];
     }
-
 }
