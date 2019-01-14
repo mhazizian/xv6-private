@@ -11,7 +11,7 @@ struct shm {
     uint ref_count;
     // number of tables allocated to this shared memory(page_count)
     uint size;
-    char* shared_page_physical_addresses[15];
+    uint shared_page_physical_addresses[15];
 };
 
 struct shm shm_table[100];

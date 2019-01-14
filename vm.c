@@ -6,7 +6,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "elf.h"
-
+#include "sharedm.h"
 extern char data[];	// defined by kernel.ld
 pde_t *kpgdir;	// for use in scheduler()
 
@@ -198,25 +198,25 @@ mappagesinsharedmem(pde_t *pgdir, uint start, uint physical_adr)
 	if(mappages(pgdir, (char*)start, PGSIZE, physical_adr, PTE_W|PTE_U|PTE_P) < 0)
 	{
         cprintf("mappages failed\n");
-        return (void*)-1;
+        return -1;
 	}
 	return 0;
 }
 
-char*
+uint
 initsharedmem(pde_t *pgdir, uint start)
 {
 	char * mem;
 	mem = kalloc();
 	if (mem == 0){
 	    cprintf("allocuvm out of memory\n");
-	    return (void*)-1;
+	    return -1;
 	}
 	memset(mem, 0, PGSIZE);
 	if (mappages(pgdir, (char*)start, PGSIZE, V2P(mem), PTE_W|PTE_U|PTE_P) < 0)
     {
         cprintf("mappages failed\n");
-        return (void*)-1;
+        return -1;
     }
 	return V2P(mem);
 }
@@ -349,6 +349,11 @@ copyuvm(pde_t *pgdir, uint sz)
 	pte_t *pte;
 	uint pa, i, flags;
 	char *mem;
+	int j, k;
+    struct proc *p = myproc();
+
+    int va_is_shared;
+    struct shm* shared_memory;
 
 	if((d = setupkvm()) == 0)
 		return 0;
@@ -359,9 +364,39 @@ copyuvm(pde_t *pgdir, uint sz)
 			panic("copyuvm: page not present");
 		pa = PTE_ADDR(*pte);
 		flags = PTE_FLAGS(*pte);
-		if((mem = kalloc()) == 0)
-			goto bad;
-		memmove(mem, (char*)P2V(pa), PGSIZE);
+
+
+		va_is_shared = -1;
+		for (j = 0; j < (p->sharedm_count); j++)
+        {
+		    for (k = 0; k < shm_table_size; k++)
+		        if (shm_table[k].id == p->sharedm_ids[j])
+		            break;
+		    shared_memory = &shm_table[k];
+
+		    if (p->sharedm_virtual_addresses[j] <= i &&
+		            i <= p->sharedm_virtual_addresses[j] + shared_memory->size * PGSIZE)
+            {
+		        va_is_shared = j;
+                break;
+            }
+        }
+
+
+        if (va_is_shared == -1)
+        {
+            if((mem = kalloc()) == 0)
+                goto bad;
+            memmove(mem, (char*)P2V(pa), PGSIZE);
+        }
+        else
+        {
+            int shm_page_index;
+            shm_page_index = (i - p->sharedm_virtual_addresses[j]) / PGSIZE;
+            mem = shared_memory->shared_page_physical_addresses[shm_page_index];
+        }
+
+        
 		if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0) {
 			kfree(mem);
 			goto bad;

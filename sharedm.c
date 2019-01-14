@@ -35,12 +35,12 @@ int shm_open(int id, int page_count, int flag)
     }
 
     struct proc* curproc = myproc();
-    char * physical_address;
+    uint physical_address;
 
     for (int i = 0; i < page_count; i++)
     {
         physical_address = initsharedmem(curproc->pgdir, curproc->sz);
-        if (physical_address == (void*)-1)
+        if (physical_address == -1)
         {
             cprintf("Error: allocation failed");
             return -2;
@@ -89,7 +89,7 @@ void * shm_attach(int id)
         if (mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add) < 0)
         {
             cprintf("Error: memory map failed");
-            return -2;
+            return (void*)-2;
         }
         curproc->sz+= PGSIZE;
     }
@@ -125,4 +125,5 @@ int shm_close(int id)
         shm_table[row].shared_page_physical_addresses[i] =
                     shm_table[shm_table_size].shared_page_physical_addresses[i];
     }
+    return 0;
 }
