@@ -292,6 +292,10 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
 	pte_t *pte;
 	uint a, pa;
+	uint i, k, j, sh_idx;
+	int va, skip_pgt = 0;
+
+	struct proc *curproc = myproc();
 
 	if(newsz >= oldsz)
 		return oldsz;
@@ -302,12 +306,29 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 		if(!pte)
 			a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE;
 		else if((*pte & PTE_P) != 0){
-			pa = PTE_ADDR(*pte);
-			if(pa == 0)
-                panic("kfree");
-			char *v = P2V(pa);
-			kfree(v);
-			*pte = 0;
+
+			skip_pgt = 0;
+			for (sh_idx = 0; sh_idx < curproc->sharedm_count; sh_idx++) {
+				for (k = 0; k < shm_table_size; k++)
+					if (shm_table[k].id == curproc->sharedm_ids[sh_idx])
+							break;
+
+				va = curproc->sharedm_virtual_addresses[sh_idx];
+				for(j = 0; j < shm_table[k].size; j++) {
+					if (shm_table[k].ref_count > 0 && PDX(va) == PDX(a))
+						skip_pgt = 1;
+					va += PGSIZE;
+				}
+			}
+
+			if (!skip_pgt) {
+				pa = PTE_ADDR(*pte);
+				if(pa == 0)
+					panic("kfree");
+				char *v = P2V(pa);
+				kfree(v);
+				*pte = 0;
+			}
 		}
 	}
 	return newsz;
@@ -328,30 +349,28 @@ freevm(pde_t *pgdir)
 
 	for(i = 0; i < NPDENTRIES; i++){
 		if(pgdir[i] & PTE_P){
-			skip_pgt = 0;
+			// skip_pgt = 0;
 
-			for (sh_idx = 0; sh_idx < curproc->sharedm_count; sh_idx++) {
-				for (k = 0; k < shm_table_size; k++)
-					if (shm_table[k].id == curproc->sharedm_ids[sh_idx])
-							break;
+			// for (sh_idx = 0; sh_idx < curproc->sharedm_count; sh_idx++) {
+			// 	for (k = 0; k < shm_table_size; k++)
+			// 		if (shm_table[k].id == curproc->sharedm_ids[sh_idx])
+			// 				break;
 
-				va = curproc->sharedm_virtual_addresses[sh_idx];
-				for(j = 0; j < shm_table[k].size; j++) {
-					if (PDX(va) == i) {
-						if (shm_table[k].ref_count > 0)
-							skip_pgt = 1;
-					}
-					va += PGSIZE;
-				}
-			}
-			// if (i == PDX(va) && ref_cout > 0 ) {
-			// 	continue;
+			// 	va = curproc->sharedm_virtual_addresses[sh_idx];
+			// 	for(j = 0; j < shm_table[k].size; j++) {
+			// 		if (PDX(va) == i) {
+			// 			if (shm_table[k].ref_count > 0)
+			// 				skip_pgt = 1;
+			// 		}
+			// 		va += PGSIZE;
+			// 	}
 			// }
+
 			
-			if (!skip_pgt) {
+			// if (!skip_pgt) {
 				char * v = P2V(PTE_ADDR(pgdir[i]));
 				kfree(v);
-			}
+			// }
 		}
 	}
 	kfree((char*)pgdir);
