@@ -73,6 +73,7 @@ int shm_open(int id, int page_count, int flag)
 }
 void * shm_attach(int id)
 {
+    int permission;
     struct proc* curproc = myproc();
     int segment_id = -1;
     for (int i = 0; i < shm_table_size; i++)
@@ -90,7 +91,31 @@ void * shm_attach(int id)
     for (int i = 0; i < shm_table[segment_id].size; i++)
     {
         uint phys_add = shm_table[segment_id].shared_page_physical_addresses[i];
-        if (mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add) < 0)
+        switch(shm_table[segment_id].flags)
+        {
+            case NONE:
+                permission = PTE_W | PTE_U | PTE_P;
+                break;
+            case ONLY_CHILD_CAN_ATTACH:
+                if (curproc->parent != shm_table[segment_id].owner_process)
+                {
+                    cprintf("Only child can attach\n");
+                    return -3;
+                    break;
+                }
+            case ONLY_OWNER_WRITE:
+                permission = PTE_U | PTE_P;
+                break;
+            case ONLY_OWNER_WRITE_ONLY_CHILD_ATTACH:
+                if (curproc->parent != shm_table[segment_id].owner_process)
+                {
+                    cprintf("Only child can attach\n");
+                    return -3;
+                    break;
+                }
+                permission = PTE_U | PTE_P;
+        }
+        if (mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add, permission) < 0)
         {
             cprintf("Error: memory map failed");
             return (void*)-2;

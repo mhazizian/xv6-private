@@ -260,7 +260,7 @@ exit(void)
 
 	for (i = 0; i < curproc->sharedm_count; i++) {
 		for (k = 0; k < shm_table_size; k++)
-			if (shm_table[k].id == p->sharedm_ids[i])
+			if (shm_table[k].id == curproc->sharedm_ids[i])
 		            break;
 		shm_table[k].ref_count--;
 	}
@@ -307,13 +307,16 @@ wait(void)
 			if(p->parent != curproc)
 				continue;
 			havekids = 1;
+
 			if(p->state == ZOMBIE){
 				// Found one.
 				pid = p->pid;
-				kfree(p->kstack);
-				p->kstack = 0;
-				freevm(p->pgdir);
-				p->pid = 0;
+                kfree(p->kstack);
+                p->kstack = 0;
+                cprintf("we are found one / wait before freevm\n");
+                freevm(p->pgdir);
+                cprintf("we are found one / wait after freevm\n");
+                p->pid = 0;
 				p->parent = 0;
 				p->name[0] = 0;
 				p->killed = 0;

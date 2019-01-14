@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     }
 
 
-    sleep(500);
+//    sleep(500);
     exit();
     return 0;
 }

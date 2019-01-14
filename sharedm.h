@@ -1,5 +1,5 @@
 #include "param.h"
-enum shm_flag { ONLY_OWNER_WRITE = 0, ONLY_CHILD_CAN_ATTACH = 1 };
+enum shm_flag { ONLY_OWNER_WRITE = 0, ONLY_CHILD_CAN_ATTACH = 1, ONLY_OWNER_WRITE_ONLY_CHILD_ATTACH = 2, NONE = 3 };
 int shm_open(int, int, int);
 void * shm_attach(int);
 int shm_close(int);

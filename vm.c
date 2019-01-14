@@ -198,7 +198,7 @@ inituvm(pde_t *pgdir, char *init, uint sz)
 }
 
 int
-mappagesinsharedmem(pde_t *pgdir, uint start, uint physical_adr)
+mappagesinsharedmem(pde_t *pgdir, uint start, uint physical_adr, int permission)
 {
 	if(mappages(pgdir, (char*)start, PGSIZE, physical_adr, PTE_W|PTE_U|PTE_P) < 0)
 	{
@@ -306,7 +306,6 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 		if(!pte)
 			a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE;
 		else if((*pte & PTE_P) != 0){
-
 			skip_pgt = 0;
 			for (sh_idx = 0; sh_idx < curproc->sharedm_count; sh_idx++) {
 				for (k = 0; k < shm_table_size; k++)
@@ -347,10 +346,14 @@ freevm(pde_t *pgdir)
 	uint i, k, j, sh_idx;
 	int va, skip_pgt = 0;
 	struct proc *curproc = myproc();
+    cprintf("----------at the beginnig of freevm\n");
+	if(pgdir == 0) {
+        panic("freevm: no pgdir");
+    }
+    deallocuvm(pgdir, KERNBASE, 0);
+    cprintf("----------after deallocation\n");
 
-	if(pgdir == 0)
-		panic("freevm: no pgdir");
-	deallocuvm(pgdir, KERNBASE, 0);
+    cprintf("we are in freevm\n");
 
 	for(i = 0; i < NPDENTRIES; i++){
 		if(pgdir[i] & PTE_P){
@@ -374,6 +377,7 @@ freevm(pde_t *pgdir)
 			
 			// if (!skip_pgt) {
 				char * v = P2V(PTE_ADDR(pgdir[i]));
+
 				kfree(v);
 			// }
 		}
