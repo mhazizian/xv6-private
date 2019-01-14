@@ -2,6 +2,8 @@
 #include "date.h"
 // Per-CPU state
 
+#define MAX_NUMBER_OF_SHARED_MEMORY 10
+
 #define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
 #define MAX_ARGUMENTS_NUMBER 3
 #define MAX_SYS_CALL_NUMBERS 16
@@ -88,6 +90,10 @@ struct proc {
 	struct file *ofile[NOFILE];	// Open files
 	struct inode *cwd;					 // Current directory
 	char name[16];							 // Process name (debugging)
+
+	int sharedm_ids[MAX_NUMBER_OF_SHARED_MEMORY];
+	int sharedm_virtual_addresses[MAX_NUMBER_OF_SHARED_MEMORY];
+	int sharedm_count;
 };
 
 // Process memory is laid out contiguously, low addresses first:

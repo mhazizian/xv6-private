@@ -58,8 +58,14 @@ int shm_open(int id, int page_count, int flag)
 
     shm_table_size++;
 
+    int sharedm_va = curproc->sz - PGSIZE * page_count;
+
+    curproc->sharedm_ids[curproc->sharedm_count] = id;
+    curproc->sharedm_virtual_addresses[curproc->sharedm_count] = sharedm_va;
+    curproc->sharedm_count++;
+    
     // should return virtual address of start of shared segment
-    return curproc->sz - PGSIZE * page_count;
+    return sharedm_va;
 }
 void * shm_attach(int id)
 {
@@ -87,8 +93,14 @@ void * shm_attach(int id)
         }
         curproc->sz+= PGSIZE;
     }
+    int sharedm_va = curproc->sz - PGSIZE * shm_table[segment_id].size;
+
+    curproc->sharedm_ids[curproc->sharedm_count] = segment_id;
+    curproc->sharedm_virtual_addresses[curproc->sharedm_count] = sharedm_va;
+    curproc->sharedm_count++;
+
     // should return virtual address of start of shared segment
-    return curproc->sz - PGSIZE * shm_table[segment_id].size;
+    return sharedm_va;
 }
 int shm_close(int id)
 {
