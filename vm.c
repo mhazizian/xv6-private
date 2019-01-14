@@ -195,7 +195,12 @@ inituvm(pde_t *pgdir, char *init, uint sz)
 int
 mappagesinsharedmem(pde_t *pgdir, uint start, uint physical_adr)
 {
-	return mappages(pgdir, (char*)start, PGSIZE, physical_adr, PTE_W|PTE_U);;
+	if(mappages(pgdir, (char*)start, PGSIZE, physical_adr, PTE_W|PTE_U|PTE_P) < 0)
+	{
+        cprintf("mappages failed\n");
+        return (void*)-1;
+	}
+	return 0;
 }
 
 char*

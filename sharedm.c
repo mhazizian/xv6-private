@@ -58,13 +58,14 @@ int shm_open(int id, int page_count, int flag)
 
     shm_table_size++;
 
-    return 0;
+    // should return virtual address of start of shared segment
+    return curproc->sz - PGSIZE * page_count;
 }
 void * shm_attach(int id)
 {
     struct proc* curproc = myproc();
     int segment_id = -1;
-    for (int i = 0; i < SHMEMTABSIZE; i++)
+    for (int i = 0; i < shm_table_size; i++)
     {
         if (shm_table[i].id == id)
         {
@@ -79,13 +80,15 @@ void * shm_attach(int id)
     for (int i = 0; i < shm_table[segment_id].size; i++)
     {
         uint phys_add = shm_table[segment_id].shared_page_physical_addresses[i];
-        mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add);
+        if (mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add) < 0)
+        {
+            cprintf("Error: memory map failed");
+            return -2;
+        }
         curproc->sz+= PGSIZE;
     }
-    return 0;
     // should return virtual address of start of shared segment
-
-
+    return curproc->sz - PGSIZE * shm_table[segment_id].size;
 }
 int shm_close(int id)
 {
