@@ -101,8 +101,9 @@ void * shm_attach(int id)
                 {
                     cprintf("Only child can attach\n");
                     return -3;
-                    break;
                 }
+                permission = PTE_W | PTE_U | PTE_P;
+                break;
             case ONLY_OWNER_WRITE:
                 permission = PTE_U | PTE_P;
                 break;
@@ -111,9 +112,9 @@ void * shm_attach(int id)
                 {
                     cprintf("Only child can attach\n");
                     return -3;
-                    break;
                 }
                 permission = PTE_U | PTE_P;
+                break;
         }
         if (mappagesinsharedmem(curproc->pgdir, curproc->sz, phys_add, permission) < 0)
         {
