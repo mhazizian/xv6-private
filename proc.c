@@ -183,10 +183,9 @@ growproc(int n)
 int
 fork(void)
 {
-	int i, pid;
+	int i, j, pid;
 	struct proc *np;
 	struct proc *curproc = myproc();
-
 	// Allocate process.
 	if((np = allocproc()) == 0){
 		return -1;
@@ -214,6 +213,21 @@ fork(void)
 	safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
 	pid = np->pid;
+
+	np->sharedm_count = curproc->sharedm_count;
+	for (i = 0; i < np->sharedm_count; i++)
+	{
+		np->sharedm_ids[i] = curproc->sharedm_ids[i];
+		np->sharedm_virtual_addresses[i] = curproc->sharedm_virtual_addresses[i];
+	}
+
+	for (i = 0; i < curproc->sharedm_count; i++)
+	{
+		for (j = 0; j < shm_table_size; j++)
+			if (shm_table[j].id == curproc->sharedm_ids[i])
+				break;
+		shm_table[j].ref_count++;
+	}
 
 	acquire(&ptable.lock);
 

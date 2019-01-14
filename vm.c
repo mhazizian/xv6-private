@@ -375,7 +375,7 @@ copyuvm(pde_t *pgdir, uint sz)
 		    shared_memory = &shm_table[k];
 
 		    if (p->sharedm_virtual_addresses[j] <= i &&
-		            i <= p->sharedm_virtual_addresses[j] + shared_memory->size * PGSIZE)
+		            i < p->sharedm_virtual_addresses[j] + shared_memory->size * PGSIZE)
             {
 		        va_is_shared = j;
                 break;
@@ -396,7 +396,7 @@ copyuvm(pde_t *pgdir, uint sz)
             mem = shared_memory->shared_page_physical_addresses[shm_page_index];
         }
 
-        
+
 		if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0) {
 			kfree(mem);
 			goto bad;
