@@ -299,7 +299,7 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 		else if((*pte & PTE_P) != 0){
 			pa = PTE_ADDR(*pte);
 			if(pa == 0)
-				panic("kfree");
+                panic("kfree");
 			char *v = P2V(pa);
 			kfree(v);
 			*pte = 0;
@@ -321,9 +321,11 @@ freevm(pde_t *pgdir)
 	for(i = 0; i < NPDENTRIES; i++){
 		if(pgdir[i] & PTE_P){
 			char * v = P2V(PTE_ADDR(pgdir[i]));
+//			cprintf("we are in freevm\n");
 			kfree(v);
 		}
 	}
+    cprintf("we are in freevm\n");
 	kfree((char*)pgdir);
 }
 
@@ -398,6 +400,7 @@ copyuvm(pde_t *pgdir, uint sz)
 
 
 		if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0) {
+		    cprintf("we are in copyuvm");
 			kfree(mem);
 			goto bad;
 		}
