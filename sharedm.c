@@ -61,15 +61,14 @@ int shm_open(int id, int page_count, int flag)
     shm_table_size++;
 
     int sharedm_va = curproc->sz - PGSIZE * page_count;
-    cprintf("sharedm_va is: %d, curproc->sz: %d, page_count:%d\n\n\n\n", sharedm_va, curproc->sz, page_count);
 
     curproc->sharedm_ids[curproc->sharedm_count] = id;
     curproc->sharedm_virtual_addresses[curproc->sharedm_count] = sharedm_va;
     curproc->sharedm_count++;
     
     // should return virtual address of start of shared segment
-    pte_t *pte = walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
-    cprintf("## Open: va to physical: %d", PTE_ADDR(*pte));
+    pte_t *pte = global_walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
+    cprintf("## Open: va to physical: %d to %d, pid = %d\n", sharedm_va, PTE_ADDR(*pte), curproc->pid);
     return sharedm_va;
 }
 void * shm_attach(int id)
@@ -105,8 +104,8 @@ void * shm_attach(int id)
     curproc->sharedm_count++;
 
     // should return virtual address of start of shared segment
-    pte_t *pte = walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
-    cprintf("## Attach: va to physical: %d", PTE_ADDR(*pte));
+    pte_t *pte = global_walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
+    cprintf("## Attach: va to physical: %d to %d, pid = %d\n", sharedm_va, PTE_ADDR(*pte), curproc->pid);
     return sharedm_va;
 }
 int shm_close(int id)
