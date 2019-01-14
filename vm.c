@@ -393,7 +393,7 @@ copyuvm(pde_t *pgdir, uint sz)
         {
             int shm_page_index;
             shm_page_index = (i - p->sharedm_virtual_addresses[j]) / PGSIZE;
-            mem = shared_memory->shared_page_physical_addresses[shm_page_index];
+            mem = (char*) shared_memory->shared_page_physical_addresses[shm_page_index];
         }
 
 

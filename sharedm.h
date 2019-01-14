@@ -14,5 +14,5 @@ struct shm {
     uint shared_page_physical_addresses[15];
 };
 
-struct shm shm_table[100];
+struct shm shm_table[SHMEMTABSIZE];
 int shm_table_size;

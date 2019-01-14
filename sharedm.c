@@ -25,11 +25,13 @@
 
 int shm_open(int id, int page_count, int flag)
 {
+//    for (int i = 0; i < SHMEMTABSIZE; i++)
+//        cprintf("%d\n", shm_table[i].id);
     for (int i = 0; i < shm_table_size; i++)
     {
         if (shm_table[i].id == id)
         {
-            cprintf("Error: id is duplicate");
+            cprintf("Error: id is duplicate %d, %d\n", shm_table[i].id, id);
             return -1;
         }
     }
