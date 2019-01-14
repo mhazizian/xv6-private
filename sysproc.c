@@ -105,8 +105,7 @@ int sys_shm_open(void)
     if(argint(2, &flag) < 0)
         return -1;
 
-    shm_open(id, page_count, flag);
-	return 0;
+    return shm_open(id, page_count, flag);
 }
 int sys_shm_attach(void)
 {
@@ -115,8 +114,7 @@ int sys_shm_attach(void)
 	if(argint(0, &id) < 0)
 		return -1;
 
-	shm_attach(id);
-	return 0;
+	return shm_attach(id);
 }
 int sys_shm_close(void)
 {
@@ -125,6 +123,5 @@ int sys_shm_close(void)
 	if(argint(0, &id) < 0)
 		return -1;
 
-	shm_close(id);
-	return 0;
+	return shm_close(id);
 }
