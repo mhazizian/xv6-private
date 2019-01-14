@@ -330,7 +330,6 @@ freevm(pde_t *pgdir)
 			kfree(v);
 		}
 	}
-    cprintf("we are in freevm\n");
 	kfree((char*)pgdir);
 }
 
@@ -405,7 +404,6 @@ copyuvm(pde_t *pgdir, uint sz)
 
 
 		if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0) {
-		    cprintf("we are in copyuvm");
 			kfree(mem);
 			goto bad;
 		}

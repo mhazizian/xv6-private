@@ -190,16 +190,13 @@ fork(void)
 	if((np = allocproc()) == 0){
 		return -1;
 	}
-    cprintf("we are in fork 193");
 	// Copy process state from proc.
 	if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
-		cprintf("we are in fork");
 		kfree(np->kstack);
         np->kstack = 0;
 		np->state = UNUSED;
 		return -1;
 	}
-    cprintf("we are in fork 202");
 	np->sz = curproc->sz;
 	np->parent = curproc;
 	*np->tf = *curproc->tf;
@@ -218,7 +215,6 @@ fork(void)
 
 	np->sharedm_count = curproc->sharedm_count;
 
-    cprintf("we are in fork 221");
 	for (i = 0; i < np->sharedm_count; i++)
 	{
 		np->sharedm_ids[i] = curproc->sharedm_ids[i];
@@ -232,13 +228,11 @@ fork(void)
 				break;
 		shm_table[j].ref_count++;
 	}
-    cprintf("we are in fork 235");
 	acquire(&ptable.lock);
 
 	np->state = RUNNABLE;
 
 	release(&ptable.lock);
-    cprintf("we are in fork 241\n");
 	return pid;
 }
 
