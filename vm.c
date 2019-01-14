@@ -318,16 +318,40 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 void
 freevm(pde_t *pgdir)
 {
-	uint i;
+	uint i, k, j, sh_idx;
+	int va, skip_pgt = 0;
+	struct proc *curproc = myproc();
 
 	if(pgdir == 0)
 		panic("freevm: no pgdir");
 	deallocuvm(pgdir, KERNBASE, 0);
+
 	for(i = 0; i < NPDENTRIES; i++){
 		if(pgdir[i] & PTE_P){
-			char * v = P2V(PTE_ADDR(pgdir[i]));
-//			cprintf("we are in freevm\n");
-			kfree(v);
+			skip_pgt = 0;
+
+			for (sh_idx = 0; sh_idx < curproc->sharedm_count; sh_idx++) {
+				for (k = 0; k < shm_table_size; k++)
+					if (shm_table[k].id == curproc->sharedm_ids[sh_idx])
+							break;
+
+				va = curproc->sharedm_virtual_addresses[sh_idx];
+				for(j = 0; j < shm_table[k].size; j++) {
+					if (PDX(va) == i) {
+						if (shm_table[k].ref_count > 0)
+							skip_pgt = 1;
+					}
+					va += PGSIZE;
+				}
+			}
+			// if (i == PDX(va) && ref_cout > 0 ) {
+			// 	continue;
+			// }
+			
+			if (!skip_pgt) {
+				char * v = P2V(PTE_ADDR(pgdir[i]));
+				kfree(v);
+			}
 		}
 	}
 	kfree((char*)pgdir);
