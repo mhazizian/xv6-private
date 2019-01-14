@@ -39,7 +39,7 @@ int shm_open(int id, int page_count, int flag)
 
     for (int i = 0; i < page_count; i++)
     {
-        physical_address = initsharedmem(curproc->pgdir, curproc->sz >> 0x16);
+        physical_address = initsharedmem(curproc->pgdir, curproc->sz);
         if (physical_address == (void*)-1)
         {
             cprintf("Error: allocation failed");
