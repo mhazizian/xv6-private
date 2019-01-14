@@ -25,7 +25,7 @@
 
 int shm_open(int id, int page_count, int flag)
 {
-    for (int i = 0; i < SHMEMTABSIZE; i++)
+    for (int i = 0; i < shm_table_size; i++)
     {
         if (shm_table[i].id == id)
         {
@@ -33,12 +33,18 @@ int shm_open(int id, int page_count, int flag)
             return -1;
         }
     }
+
     struct proc* curproc = myproc();
     char * physical_address;
 
     for (int i = 0; i < page_count; i++)
     {
-        physical_address = initsharedmem(curproc->pgdir, curproc->sz);
+        physical_address = initsharedmem(curproc->pgdir, curproc->sz >> 0x19);
+        if (physical_address == (void*)-1)
+        {
+            cprintf("Error: allocation failed");
+            return -2;
+        }
         curproc->sz += PGSIZE;
         shm_table[shm_table_size].shared_page_physical_addresses[i] = physical_address;
     }
@@ -46,7 +52,7 @@ int shm_open(int id, int page_count, int flag)
 
     shm_table[shm_table_size].id = id;
     shm_table[shm_table_size].owner_process = curproc->pid;
-    shm_table[shm_table_size].flags = flag;
+    shm_table[shm_table_size].flags = flag;//TODO
     shm_table[shm_table_size].ref_count++;
     shm_table[shm_table_size].size = page_count;
 

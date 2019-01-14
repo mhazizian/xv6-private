@@ -203,8 +203,16 @@ initsharedmem(pde_t *pgdir, uint start)
 {
 	char * mem;
 	mem = kalloc();
+	if (mem == 0){
+	    cprintf("allocuvm out of memory\n");
+	    return (void*)-1;
+	}
 	memset(mem, 0, PGSIZE);
-	mappages(pgdir, (char*)start, PGSIZE, V2P(mem), PTE_W|PTE_U);
+	if (mappages(pgdir, (char*)start, PGSIZE, V2P(mem), PTE_W|PTE_U|PTE_P) < 0)
+    {
+        cprintf("mappages failed\n");
+        return (void*)-1;
+    }
 	return V2P(mem);
 }
 
