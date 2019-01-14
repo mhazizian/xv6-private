@@ -102,7 +102,6 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_invoked_syscalls(void);
 extern int sys_shm_open(void);
 extern int sys_shm_attach(void);
 extern int sys_shm_close(void);
@@ -130,7 +129,6 @@ static int (*syscalls[])(void) = {
 [SYS_link]		sys_link,
 [SYS_mkdir]	 sys_mkdir,
 [SYS_close]	 sys_close,
-[SYS_invoked_syscalls]		sys_invoked_syscalls,
 [SYS_shm_open]		sys_shm_open,
 [SYS_shm_attach]		sys_shm_attach,
 [SYS_shm_close]		sys_shm_close,
@@ -142,17 +140,9 @@ syscall(void)
 {
 	int num;
 	struct proc *curproc = myproc();
-//    char *sss =(char*) malloc(1);
-//    cprintf("%s", sss);
 	num = curproc->tf->eax;
 	if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-//        cprintf("This is num: %d  \n", num);
-        system_calls[num].number_of_calls++;
-        process_system_calls[curproc->pid][num].number_of_calls++;
-//			cmostime(&system_calls[num].time);
-
         curproc->tf->eax = syscalls[num]();
-
     } else {
 		cprintf("%d %s: unknown sys call %d\n",
 						curproc->pid, curproc->name, num);

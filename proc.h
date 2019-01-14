@@ -1,43 +1,7 @@
 #include "param.h"
 #include "date.h"
 // Per-CPU state
-
 #define MAX_NUMBER_OF_SHARED_MEMORY 10
-
-#define SYS_CALL_NUMBERS 23 /// @todo move this to appropriate place
-#define MAX_ARGUMENTS_NUMBER 3
-#define MAX_SYS_CALL_NUMBERS 16
-#define MAX_CHARP_SIZE 16
-#define MAX_INTP_SIZE 16
-#define FIRST 0
-#define SECOND 1
-#define THIRD 2
-
-enum argument_type {
-    VOID,
-    INT,
-    CHARP
-};
-
-struct argumnet
-{
-     enum argument_type type;
-     int int_value;
-     char charp_value[MAX_CHARP_SIZE];
-};
-
-struct system_call_status {
-    struct rtcdate time;
-    struct argumnet arguments[MAX_ARGUMENTS_NUMBER];
-};
-
-struct system_call {
-    int number_of_calls;
-    struct system_call_status system_calls[MAX_SYS_CALL_NUMBERS];
-};
-
-struct system_call system_calls[SYS_CALL_NUMBERS];
-struct system_call process_system_calls[NPROC][SYS_CALL_NUMBERS];
 
 struct cpu {
 	uchar apicid;								// Local APIC ID
@@ -76,7 +40,6 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 // This struct is for kernel not process!!!!
 // Per-process state
 struct proc {
-	int last_system_call;
 	uint sz;										 // Size of process memory (bytes)
 	pde_t* pgdir;								// Page table
 	char *kstack;								// Bottom of kernel stack for this process
