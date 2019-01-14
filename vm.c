@@ -312,12 +312,12 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 					if (shm_table[k].id == curproc->sharedm_ids[sh_idx])
 						break;
 
-				cprintf("@@@ Checking shm obj: id=%d, size=%d, ref_cout=%d\n", shm_table[k].id, shm_table[k].size, shm_table[k].ref_count);
+				// cprintf("@@@ Checking shm obj: id=%d, size=%d, ref_cout=%d\n", shm_table[k].id, shm_table[k].size, shm_table[k].ref_count);
 
 				va = curproc->sharedm_virtual_addresses[sh_idx];
 				for(j = 0; j < shm_table[k].size; j++) {
 
-					cprintf("@@@ shm obj: id=%d --- PDX(va)=%d, PDX(a)=%d\n", shm_table[k].id, PDX(va), PDX(a));
+					// cprintf("@@@ shm obj: id=%d --- PDX(va)=%d, PDX(a)=%d\n", shm_table[k].id, PDX(va), PDX(a));
 
 					if (shm_table[k].ref_count > 0 && PDX(va) == PDX(a))
 						skip_pgt = 1;
