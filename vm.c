@@ -292,7 +292,8 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
 	pte_t *pte;
 	uint a, pa;
-	uint i, k, j, sh_idx;
+//	uint i;
+	uint k, j, sh_idx;
 	int va, skip_pgt = 0;
 
 	struct proc *curproc = myproc();
@@ -343,17 +344,17 @@ deallocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 void
 freevm(pde_t *pgdir)
 {
-	uint i, k, j, sh_idx;
-	int va, skip_pgt = 0;
-	struct proc *curproc = myproc();
-    cprintf("----------at the beginnig of freevm\n");
+	uint i;//, k, j, sh_idx;
+//	int va, skip_pgt = 0;
+//	struct proc *curproc = myproc();
+//    cprintf("----------at the beginnig of freevm\n");
 	if(pgdir == 0) {
         panic("freevm: no pgdir");
     }
     deallocuvm(pgdir, KERNBASE, 0);
-    cprintf("----------after deallocation\n");
+//    cprintf("----------after deallocation\n");
 
-    cprintf("we are in freevm\n");
+//    cprintf("we are in freevm\n");
 
 	for(i = 0; i < NPDENTRIES; i++){
 		if(pgdir[i] & PTE_P){

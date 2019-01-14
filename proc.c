@@ -313,9 +313,9 @@ wait(void)
 				pid = p->pid;
                 kfree(p->kstack);
                 p->kstack = 0;
-                cprintf("we are found one / wait before freevm\n");
+//                cprintf("we are found one / wait before freevm\n");
                 freevm(p->pgdir);
-                cprintf("we are found one / wait after freevm\n");
+//                cprintf("we are found one / wait after freevm\n");
                 p->pid = 0;
 				p->parent = 0;
 				p->name[0] = 0;
