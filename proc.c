@@ -245,6 +245,7 @@ exit(void)
 	struct proc *curproc = myproc();
 	struct proc *p;
 	int fd;
+	int i, k;
 
 	if(curproc == initproc)
 		panic("init exiting");
@@ -255,6 +256,13 @@ exit(void)
 			fileclose(curproc->ofile[fd]);
 			curproc->ofile[fd] = 0;
 		}
+	}
+
+	for (i = 0; i < curproc->sharedm_count; i++) {
+		for (k = 0; k < shm_table_size; k++)
+			if (shm_table[k].id == p->sharedm_ids[i])
+		            break;
+		shm_table[k].ref_count--;
 	}
 
 	begin_op();
