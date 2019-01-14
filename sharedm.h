@@ -9,6 +9,7 @@ struct shm {
     uint owner_process;
     enum shm_flag flags;
     uint ref_count;
+    // number of tables allocated to this shared memory(page_count)
     uint size;
     char* shared_page_physical_addresses[15];
 };
