@@ -68,6 +68,8 @@ int shm_open(int id, int page_count, int flag)
     curproc->sharedm_count++;
     
     // should return virtual address of start of shared segment
+    pte_t *pte = walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
+    cprintf("## Open: va to physical: %d", PTE_ADDR(*pte));
     return sharedm_va;
 }
 void * shm_attach(int id)
@@ -103,6 +105,8 @@ void * shm_attach(int id)
     curproc->sharedm_count++;
 
     // should return virtual address of start of shared segment
+    pte_t *pte = walkpgdir(curproc->pgdir, (void *) sharedm_va, 0);
+    cprintf("## Attach: va to physical: %d", PTE_ADDR(*pte));
     return sharedm_va;
 }
 int shm_close(int id)
