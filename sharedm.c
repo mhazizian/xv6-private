@@ -61,6 +61,7 @@ int shm_open(int id, int page_count, int flag)
     shm_table_size++;
 
     int sharedm_va = curproc->sz - PGSIZE * page_count;
+    cprintf("sharedm_va is: %d, curproc->sz: %d, page_count:%d\n\n\n\n", sharedm_va, curproc->sz, page_count);
 
     curproc->sharedm_ids[curproc->sharedm_count] = id;
     curproc->sharedm_virtual_addresses[curproc->sharedm_count] = sharedm_va;
