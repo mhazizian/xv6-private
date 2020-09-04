@@ -1,50 +1,51 @@
-xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
-Version 6 (v6).  xv6 loosely follows the structure and style of v6,
-but is implemented for a modern x86-based multiprocessor using ANSI C.
+New Features 
+------
 
-ACKNOWLEDGMENTS
+### Part 1 (Introduction to XV6): 
+* introducing contributers added to boot message.
+* moving cursor in shell added to this version.
+* sort command added. you can sort 5 numbers in arguments.
+### Part 2 (System Calls) :
+* invoked_syscalls(int pid) system call : this system call show used system calls of a process and their informations
+* get_count(int pid, int systemcallNum) system call : return and show number of a specific system calls in a process 
+* sort_syscalls(int pid) : sort all used systemcalls for a process by time 
+* log_syscalls() : log all systemcalls used in all processes sorted by time 
+* inc_num(int number) : this systemcall using register instead of stack to pass argumans. for doing that first backup from a register then add number to it. (using assembly)
+* traceTest : it's a user application in shell for using these systemcalls. you can use it with `traceTest` command in shell.
+* ctrl + p : with using `ctrl + p` you can see count of systemcalls in one process
+### Part 3 (Synchronization And Concurrency):
+* ticketlock added to OS
+* readers writers problem added
+* command `lockTest` added and you can test ticketlock and readers writers problem using this command
+### Part 4 (CPU Scheduling):
+* adding a multi-level feed back scheduler including :
+	* A Lottery scheduler for first priority
+	* A FCFS scheduler for second priority
+	* A Priority scheduler for third priority
+		*	PS all of these schedulers queues use round robin policy
+* adding `ps` command that show processes and their information such as state and scheduler queue 
+* adding `sf` command that fork a CPU bound process in lottery queue with 1000 lottery ticket
+*  adding `setQueue` command to change scheduler queue of a process
+* adding `setPriority` command to change priority of a process in priority queue
+* adding `setLottery` command to change number of lottery tickets of a process in lottery queue
+* adding `schedTest` command that fork 15 process :
+	* 5 CPU bound processs in Lottery scheduler queue
+	* 5 CPU bound process in FCFS scheduler queue
+	* 5 IO bound process in Priority scheduler queue
+### Part 5 (Memory Management):
+* adding new system calls to support share memory between processes.
+	* `sys_shm_init()` : to init all shared memories. it should used at first.
+	* `sys_shm_open(int id, int page_cnt, int flags)` : first of all a process should open a shared memory. 
+		* `id` is an unique number for every shared memory and we will use this to access shared mem.
+		* `page_cnt` is size of shared memory. ( shared memory will be an array )
+		* `flags` could be ONLY_OWNER_WRITE and ONLY_CHILD_CAN_ATTACH
+	* `sys_shm_attach(int id)` : after opening a shared memory processes should use this systemcall to access shared memory. this sys call returns pointer to first cell of shared memory.
+	* `sys_shm_close(int id)` : every process should close shared memory after using it with this syscall.
+* adding a user program named `shmTest` to test some senarios of shared memory.
 
-xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
-to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
-2000)). See also https://pdos.csail.mit.edu/6.828/, which
-provides pointers to on-line resources for v6.
+How to use? 
+------
 
-xv6 borrows code from the following sources:
-    JOS (asm.h, elf.h, mmu.h, bootasm.S, ide.c, console.c, and others)
-    Plan 9 (entryother.S, mp.h, mp.c, lapic.c)
-    FreeBSD (ioapic.c)
-    NetBSD (console.c)
+you can make this kernel using `make` command.
+also you can run this kernel on qemu virtual machine using `make qemu` command.
 
-The following people have made contributions: Russ Cox (context switching,
-locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
-Clements.
-
-We are also grateful for the bug reports and patches contributed by Silas
-Boyd-Wickizer, Anton Burtsev, Cody Cutler, Mike CAT, Tej Chajed, eyalz800,
-Nelson Elhage, Saar Ettinger, Alice Ferrazzi, Nathaniel Filardo, Peter
-Froehlich, Yakir Goaron,Shivam Handa, Bryan Henry, Jim Huang, Alexander
-Kapshuk, Anders Kaseorg, kehao95, Wolfgang Keller, Eddie Kohler, Austin
-Liew, Imbar Marinescu, Yandong Mao, Matan Shabtay, Hitoshi Mitake, Carmi
-Merimovich, Mark Morrissey, mtasm, Joel Nider, Greg Price, Ayan Shafqat,
-Eldar Sehayek, Yongming Shen, Cam Tenny, tyfkda, Rafael Ubal, Warren
-Toomey, Stephen Tu, Pablo Ventura, Xi Wang, Keiichi Watanabe, Nicolas
-Wolovick, wxdao, Grant Wu, Jindong Zhang, Icenowy Zheng, and Zou Chang Wei.
-
-The code in the files that constitute xv6 is
-Copyright 2006-2018 Frans Kaashoek, Robert Morris, and Russ Cox.
-
-ERROR REPORTS
-
-Please send errors and suggestions to Frans Kaashoek and Robert Morris
-(kaashoek,rtm@mit.edu). The main purpose of xv6 is as a teaching
-operating system for MIT's 6.828, so we are more interested in
-simplifications and clarifications than new features.
-
-BUILDING AND RUNNING XV6
-
-To build xv6 on an x86 ELF machine (like Linux or FreeBSD), run
-"make". On non-x86 or non-ELF machines (like OS X, even on x86), you
-will need to install a cross-compiler gcc suite capable of producing
-x86 ELF binaries (see https://pdos.csail.mit.edu/6.828/).
-Then run "make TOOLPREFIX=i386-jos-elf-". Now install the QEMU PC
-simulator and run "make qemu".
