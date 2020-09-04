@@ -1,5 +1,4 @@
-New Features 
-------
+# New Features 
 
 ### Part 1 (Introduction to XV6): 
 * introducing contributers added to boot message.
